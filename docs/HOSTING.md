@@ -94,18 +94,50 @@ path, and turns on HTTPS once the certificate is ready.
 
 **Custom domain (Namecheap DNS)**
 
-1. Add a file `frontend/public/CNAME` containing `elections.yourdomain.co.za`
-   (or use Settings → Pages → Custom domain, which creates it for you).
-2. At Namecheap → **Domain List → Manage → Advanced DNS**, add:
+This is the configuration `zarpolls.online` actually runs on.
+
+1. Attach it to Pages from the repo side — do not edit the domain in the web UI
+   first, or you will fight a redirect:
+   ```bash
+   ./scripts/attach_domain.sh zarpolls.online        # root
+   # ./scripts/attach_domain.sh zarpolls.online --project   # keep /ballotwatch-sa/
+   ```
+2. At Namecheap → **Domain List → Manage → Advanced DNS**:
+
+   **Delete these first** — the defaults block the new records:
+
+   | Type | Host | Value | Why it must go |
+   | --- | --- | --- | --- |
+   | URL Redirect Record | `@` | `http://www.<domain>/` | occupies the apex; no A record can be added |
+   | CNAME Record | `www` | `parkingpage.namecheap.com.` | points www at the parking page |
+
+   Then add:
 
    | Type | Host | Value | TTL |
    | --- | --- | --- | --- |
-   | CNAME | `elections` | `<you>.github.io.` | Automatic |
+   | A | `@` | `185.199.108.153` | Automatic |
+   | A | `@` | `185.199.109.153` | Automatic |
+   | A | `@` | `185.199.110.153` | Automatic |
+   | A | `@` | `185.199.111.153` | Automatic |
+   | CNAME | `www` | `<you>.github.io.` | Automatic |
 
-   For an apex domain use four `A` records instead: `185.199.108.153`,
-   `185.199.109.153`, `185.199.110.153`, `185.199.111.153`.
-3. Back in Pages, tick **Enforce HTTPS** once the certificate is issued
-   (usually minutes).
+   The trailing dot on the CNAME matters: without it Namecheap appends the
+   domain again and you get `www.<domain>.<domain>`.
+
+   Keep the `TXT` record that starts `v=spf1 include:spf.efwd…` — that is email
+   forwarding, not a parking artifact.
+3. The script waits for the certificate (`approved`), then enforces HTTPS. If it
+   exits early, re-run `gh api -X PUT repos/<you>/<repo>/pages --input -` with
+   `{"https_enforced": true}` once the certificate shows approved.
+
+Sanity check the result:
+
+```bash
+dig +short A zarpolls.online            # four 185.199.x.153 addresses
+curl -sI http://zarpolls.online         # 301 → https
+curl -sI https://zarpolls.online        # 200
+curl -s  https://zarpolls.online/api/meta.json | head -c 80
+```
 
 **Trade-off:** a snapshot every ~10 minutes. GitHub throttles scheduled
 workflows, and the IEC itself only publishes every 5–10 minutes, so this is close

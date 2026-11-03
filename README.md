@@ -8,6 +8,9 @@ baseline, turnout history, the shape of the contest — and then follows the
 Electoral Commission's own results feed on election night: national, provincial
 and council level, with the arithmetic reconciled on every refresh.
 
+**Live:** [https://zarpolls.online](https://zarpolls.online) — static snapshot,
+re-published with `make publish`.
+
 > Independent civic project. Not affiliated with, endorsed by, or speaking for the
 > Electoral Commission of South Africa. Figures are provisional until the IEC
 > declares a result.
