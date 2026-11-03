@@ -21,7 +21,7 @@ echo "→ building SPA (static mode, base ${BASE})"
 ( cd frontend && VITE_STATIC=1 VITE_BASE="$BASE" npm run build )
 
 echo "→ exporting snapshot"
-python3 backend/scripts/export_static.py --out static-export
+"${PYTHON:-python3}" backend/scripts/export_static.py --out static-export
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
