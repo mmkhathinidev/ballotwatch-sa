@@ -75,6 +75,23 @@ Either point that domain at Pages (records below), or remove it:
 **Settings of the `<you>.github.io` repo → Pages → Custom domain → remove**, then
 rebuild the project site.
 
+**Check the domain actually exists first.** A Pages custom domain pointed at an
+unregistered or DNS-less hostname is worse than none: GitHub still 301s to it.
+
+```bash
+whois yourdomain.co.za | head -5        # "available for registration" = buy it first
+dig +short NS yourdomain.co.za          # empty = no DNS, nothing will resolve
+```
+
+`scripts/attach_domain.sh <domain> [--project]` does the whole switch: detaches
+the domain from the user site, attaches it here, republishes with the right base
+path, and turns on HTTPS once the certificate is ready.
+
+```bash
+./scripts/attach_domain.sh culolethu.online --project   # keep /ballotwatch-sa/ path
+./scripts/attach_domain.sh elections.example.com        # serve at the root
+```
+
 **Custom domain (Namecheap DNS)**
 
 1. Add a file `frontend/public/CNAME` containing `elections.yourdomain.co.za`
@@ -209,6 +226,9 @@ buffered and the dashboard silently falls back to its 30 s interval.
 ---
 
 ## Namecheap DNS cheat-sheet
+
+Register the domain *before* attaching it. `.online`, `.africa` and `.co.za`
+all work with Pages; only the records below change.
 
 | Goal | Record |
 | --- | --- |
