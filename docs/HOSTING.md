@@ -41,6 +41,40 @@ push and on demand).
    ```
 4. The site appears at `https://<you>.github.io/ballotwatch-sa/`.
 
+### If Actions cannot run (billing lock, org policy, minutes limit)
+
+A scheduled workflow needs a runner, and GitHub will refuse to start jobs when the
+account has a billing problem. The Pages site does not need Actions at all if you
+build it locally and push the branch:
+
+```bash
+./scripts/publish_pages.sh          # or: make publish
+```
+
+That builds the SPA in static mode with the right base path, exports the snapshot,
+and force-pushes it to `gh-pages`. Then set **Settings → Pages → Source: Deploy
+from a branch → `gh-pages` / `/`** (one time). Verify with:
+
+```bash
+gh api repos/<you>/ballotwatch-sa/pages --jq '{status, source, cname}'
+```
+
+The cost of this route: the snapshot is as fresh as your last `make publish`.
+Re-run it (or put it on a local cron) during counting.
+
+**If your project page redirects somewhere unexpected.** GitHub Pages project
+sites inherit the custom domain of the account's *user site*
+(`<you>.github.io`). If that domain is parked or has no DNS records, every
+project URL answers `301` to a hostname that does not resolve. Check it with:
+
+```bash
+curl -sI https://<you>.github.io/ballotwatch-sa/ | grep -i location
+```
+
+Either point that domain at Pages (records below), or remove it:
+**Settings of the `<you>.github.io` repo → Pages → Custom domain → remove**, then
+rebuild the project site.
+
 **Custom domain (Namecheap DNS)**
 
 1. Add a file `frontend/public/CNAME` containing `elections.yourdomain.co.za`

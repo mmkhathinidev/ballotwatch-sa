@@ -1,4 +1,4 @@
-.PHONY: help install build run dev test static serve-static replay docker clean
+.PHONY: help install build run dev test static serve-static publish replay docker clean
 
 help:
 	@echo "install   install backend + frontend dependencies"
@@ -7,6 +7,7 @@ help:
 	@echo "dev       run the API on :8000 (frontend separately: cd frontend && npm run dev)"
 	@echo "test      run the backend test suite"
 	@echo "static    build the static (GitHub Pages / shared hosting) export"
+	@echo "publish   push the static build to the gh-pages branch"
 	@echo "replay    serve a replay of the 2021 election on :8001"
 	@echo "docker    build and run with docker compose"
 	@echo "clean     remove build artefacts and the local database"
@@ -27,6 +28,11 @@ static:
 
 serve-static: static
 	python3 -m http.server 8020 --directory static-export
+
+# Publish the snapshot to the gh-pages branch (works without GitHub Actions).
+# BASE defaults to /ballotwatch-sa/; use BASE=/ for a custom domain.
+publish:
+	./scripts/publish_pages.sh
 
 dev:
 	cd backend && python3 -m uvicorn app.main:app --reload --port 8000
