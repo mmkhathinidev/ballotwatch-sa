@@ -4,7 +4,7 @@ import { IntegrityPanel, NationalBoard, ProgressPanel } from "./components/LiveP
 import { BaselineCard, RegistrationCard, StructureCard, TurnoutCard } from "./components/Prepoll";
 import { ProvinceBoard } from "./components/ProvincePanel";
 import { Footer, SourcesPanel } from "./components/SourcesPanel";
-import { compact, num } from "./lib/format";
+import { compact, num, sast } from "./lib/format";
 import { useDashboard } from "./lib/useDashboard";
 
 export default function App() {
@@ -16,7 +16,13 @@ export default function App() {
       {
         label: "Registered voters",
         value: compact(prepoll?.registration.total || s?.registered_voters || 0),
-        foot: prepoll ? `roll as at ${prepoll.registration.as_at}` : "IEC voter roll",
+        foot: prepoll
+          ? `roll as at ${new Date(prepoll.registration.as_at).toLocaleDateString("en-ZA", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}`
+          : "IEC voter roll",
       },
       { label: "Municipal councils", value: num(s?.councils), foot: "up for election" },
       { label: "Council seats", value: num(s?.seats), foot: "ward + proportional" },
@@ -32,6 +38,13 @@ export default function App() {
   return (
     <>
       <TopBar meta={meta} error={error} />
+      {meta?.static ? (
+        <div className="notice">
+          <strong>Static snapshot</strong> built {sast(meta.generated_at)} SAST — the
+          publishing job refreshes it on a schedule. For continuous counting, run the API
+          server.
+        </div>
+      ) : null}
 
       <main className="shell">
         <section className="hero" style={{ marginTop: 0 }}>
@@ -68,7 +81,9 @@ export default function App() {
             <span className="section-sub">
               {loading
                 ? "connecting to the IEC feed…"
-                : `IEC poll every ${meta?.feed.interval_seconds ?? 30}s · page refresh 30s`}
+                : meta?.static
+                  ? "snapshot copy · re-exported by the publishing job"
+                  : `IEC poll every ${meta?.feed.interval_seconds ?? 30}s · page refresh 30s`}
               <button
                 onClick={() => void reload()}
                 className="tab"

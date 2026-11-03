@@ -1,0 +1,73 @@
+name: Publish static dashboard (GitHub Pages)
+
+# GitHub Pages cannot run Python, so this job does the polling in Actions:
+# it polls the IEC feed once, writes the JSON as plain files next to the SPA,
+# and publishes the result. Freshness = the cron interval.
+#
+# 10 minutes is the practical floor: GitHub throttles scheduled runs, and the
+# IEC itself only publishes every 5-10 minutes while counting.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - "backend/**"
+      - ".github/workflows/pages.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend
+        run: pip install -r backend/requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build SPA for the project page
+        working-directory: frontend
+        env:
+          VITE_STATIC: "1"
+          VITE_BASE: /${{ github.event.repository.name }}/
+        run: |
+          npm ci || npm install
+          npm run build
+
+      - name: Export the snapshot
+        run: python backend/scripts/export_static.py --out public
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

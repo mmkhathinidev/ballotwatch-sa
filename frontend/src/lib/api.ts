@@ -109,6 +109,8 @@ export type Meta = {
   };
   report_date: string | null;
   has_counts: boolean;
+  static?: boolean;
+  generated_at?: string;
   provinces: { id: number; name: string }[];
 };
 
@@ -187,9 +189,23 @@ export type Sources = {
   caveats: string[];
 };
 
+// Static mode: the same UI, served from pre-rendered JSON (GitHub Pages,
+// Namecheap shared hosting, S3...). Paths are relative so a project page under
+// /<repo>/ resolves correctly without configuration.
+export const isStatic = import.meta.env.VITE_STATIC === "1";
+
+const STATIC_PATHS: Record<string, string> = {
+  "/api/meta": "api/meta.json",
+  "/api/live/national": "api/national.json",
+  "/api/live/provinces": "api/provinces.json",
+  "/api/prepoll": "api/prepoll.json",
+  "/api/sources": "api/sources.json",
+};
+
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(path, { headers: { Accept: "application/json" } });
-  if (!res.ok) throw new Error(`${path} → HTTP ${res.status}`);
+  const url = isStatic ? STATIC_PATHS[path] ?? path : path;
+  const res = await fetch(url, { headers: { Accept: "application/json" } });
+  if (!res.ok) throw new Error(`${url} → HTTP ${res.status}`);
   return (await res.json()) as T;
 }
 

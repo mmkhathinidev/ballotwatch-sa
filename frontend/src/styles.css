@@ -85,6 +85,14 @@ button { font: inherit; color: inherit; }
 .pill.live .dot { animation: pulse 1.8s infinite; }
 @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
 
+.notice {
+  max-width: 1320px; margin: 16px auto 0; padding: 10px 14px;
+  border: 1px solid rgba(245,165,36,.3); border-left-width: 3px;
+  background: var(--accent-soft); color: #ffd9a0;
+  border-radius: 8px; font-size: 12.5px;
+}
+.notice strong { color: #ffe9c7; }
+
 /* ---------------- hero ---------------- */
 .hero {
   display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px;

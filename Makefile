@@ -1,4 +1,4 @@
-.PHONY: help install build run dev test test-backend lint docker clean
+.PHONY: help install build run dev test static serve-static replay docker clean
 
 help:
 	@echo "install   install backend + frontend dependencies"
@@ -6,6 +6,7 @@ help:
 	@echo "run       serve API + built SPA on :8000"
 	@echo "dev       run the API on :8000 (frontend separately: cd frontend && npm run dev)"
 	@echo "test      run the backend test suite"
+	@echo "static    build the static (GitHub Pages / shared hosting) export"
 	@echo "replay    serve a replay of the 2021 election on :8001"
 	@echo "docker    build and run with docker compose"
 	@echo "clean     remove build artefacts and the local database"
@@ -19,6 +20,13 @@ build:
 
 run: build
 	cd backend && python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+static:
+	cd frontend && VITE_STATIC=1 npm run build
+	python3 backend/scripts/export_static.py --out static-export
+
+serve-static: static
+	python3 -m http.server 8020 --directory static-export
 
 dev:
 	cd backend && python3 -m uvicorn app.main:app --reload --port 8000

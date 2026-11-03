@@ -110,6 +110,25 @@ Open <http://127.0.0.1:8000>.
 docker compose up --build      # http://127.0.0.1:8000
 ```
 
+### Static mode (GitHub Pages, shared hosting)
+
+For hosts that cannot run Python, the same UI is exported as pre-rendered JSON:
+
+```bash
+cd frontend && VITE_STATIC=1 npm run build && cd ..
+python backend/scripts/export_static.py --out static-export
+python -m http.server 8020 --directory static-export     # http://127.0.0.1:8020
+```
+
+The header shows `static build` and the page states its build time, so a snapshot
+can never be mistaken for a live feed. The bundled workflow
+`.github/workflows/pages.yml` re-exports and publishes to GitHub Pages every ten
+minutes.
+
+**Deployment walkthroughs** — GitHub Pages, Render, Fly.io, and both Namecheap
+routes (VPS for the live app, shared hosting for the static copy), including DNS
+records: [`docs/HOSTING.md`](docs/HOSTING.md).
+
 ### Replay mode
 
 Rehearse election night, or inspect how the dashboard behaves with real counts,

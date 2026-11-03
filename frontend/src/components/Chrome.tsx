@@ -1,5 +1,5 @@
 import { FeedHealth, Meta } from "../lib/api";
-import { duration, relative, sast } from "../lib/format";
+import { clock, duration, relative, sast } from "../lib/format";
 import { useNow } from "../lib/useDashboard";
 
 export function TopBar({ meta, error }: { meta: Meta | null; error: string | null }) {
@@ -23,6 +23,11 @@ export function TopBar({ meta, error }: { meta: Meta | null; error: string | nul
             Polling day <strong>Wed 4 Nov</strong>
           </span>
           {meta?.replay ? <span className="pill warn">replay {meta.year}</span> : null}
+          {meta?.static ? (
+            <span className="pill warn" title="Static snapshot — refreshed by the publishing job">
+              snapshot {clock(meta.generated_at)}
+            </span>
+          ) : null}
           {error ? <span className="pill bad">{error}</span> : null}
         </div>
       </div>
@@ -32,6 +37,13 @@ export function TopBar({ meta, error }: { meta: Meta | null; error: string | nul
 
 export function FeedPill({ feed }: { feed?: FeedHealth }) {
   if (!feed) return <span className="pill warn">connecting</span>;
+  if (feed.status === "static") {
+    return (
+      <span className="pill warn" title="Static snapshot — refreshed by the publishing job">
+        <i className="dot" /> static build · {relative(feed.polled_at)}
+      </span>
+    );
+  }
   if (feed.error || feed.status === "degraded") {
     return (
       <span className="pill bad" title={feed.error ?? undefined}>

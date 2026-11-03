@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, Meta, National, Prepoll, Province, Sources } from "./api";
+import { api, isStatic, Meta, National, Prepoll, Province, Sources } from "./api";
 
 type State = {
   meta: Meta | null;
@@ -59,14 +59,16 @@ export function useDashboard() {
 
   useEffect(() => {
     void load();
-    const timer = window.setInterval(() => void load(), 30_000);
+    const timer = window.setInterval(() => void load(), isStatic ? 60_000 : 30_000);
 
     let source: EventSource | null = null;
-    try {
-      source = new EventSource("/api/stream");
-      source.addEventListener("tick", () => void load());
-    } catch {
-      /* SSE unsupported — the interval above still refreshes */
+    if (!isStatic) {
+      try {
+        source = new EventSource("/api/stream");
+        source.addEventListener("tick", () => void load());
+      } catch {
+        /* SSE unsupported — the interval above still refreshes */
+      }
     }
     return () => {
       window.clearInterval(timer);

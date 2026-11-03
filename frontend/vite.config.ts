@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  // A GitHub project page is served from /<repo>/, so allow a base override.
+  base: (globalThis as { process?: { env?: Record<string, string> } }).process?.env?.VITE_BASE || "/",
   server: {
     port: 5173,
     proxy: {
