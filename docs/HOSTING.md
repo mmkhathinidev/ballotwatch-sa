@@ -60,7 +60,22 @@ gh api repos/<you>/ballotwatch-sa/pages --jq '{status, source, cname}'
 ```
 
 The cost of this route: the snapshot is as fresh as your last `make publish`.
-Re-run it (or put it on a local cron) during counting.
+Re-run it (or put it on a local cron) during counting:
+
+```
+*/10 * * * * /path/to/sa-election-live/scripts/cron_publish.sh
+```
+
+`cron_publish.sh` pins `PATH` (cron has no profile) and uses a project venv, so it
+needs nothing from your shell. It costs nothing to run — it is a shell script, not
+an agent task, so it consumes no model credits.
+
+**Custom domains and branch publishes.** With branch builds, Pages reads the
+`CNAME` file *from the branch*. A publish script that commits a fresh tree must
+write that file, or the next publish silently detaches the domain and the custom
+host starts 404-ing. `publish_pages.sh` now reads the configured domain from the
+Pages API and commits `CNAME` on every run — verified by publishing twice and
+re-checking `gh api repos/<you>/<repo>/pages --jq .cname`.
 
 **If your project page redirects somewhere unexpected.** GitHub Pages project
 sites inherit the custom domain of the account's *user site*
