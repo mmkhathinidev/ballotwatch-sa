@@ -70,6 +70,16 @@ Re-run it (or put it on a local cron) during counting:
 needs nothing from your shell. It costs nothing to run — it is a shell script, not
 an agent task, so it consumes no model credits.
 
+It also watches itself: if `publish_pages.sh` fails, or exits 0 without the
+`gh-pages` ref actually moving, it sends one Telegram message and carries on. The
+check compares the ref before and after rather than asking GitHub's API, which
+lags a few seconds and would false-alarm on every run.
+
+Real limits of this route: cron does not catch up on runs missed while the machine
+is asleep, and a sleeping machine publishes nothing. The site itself stays up —
+it simply keeps serving the last snapshot, and the header's "static build · Nm ago"
+pill tells you how old it is.
+
 **Custom domains and branch publishes.** With branch builds, Pages reads the
 `CNAME` file *from the branch*. A publish script that commits a fresh tree must
 write that file, or the next publish silently detaches the domain and the custom
