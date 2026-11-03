@@ -167,17 +167,25 @@ function ProvinceDetail({ row, meta }: { row?: Row; meta: Record<number, PartyMe
             </div>
             <PartyBars parties={liveParties.map((p) => ({ abbr: p.abbr, colour: p.colour, pct: p.pct, votes: p.votes, seats: p.seats }))} />
             <div className="stat-grid" style={{ marginTop: 16 }}>
+              {/* The IEC's provincial bundle lists seat winners, not every seat;
+                  show what is attributed rather than implying a shortfall. */}
               <div className="stat">
-                <span>Seats declared</span>
-                <b>
-                  {num(row.live?.seats_allocated)} / {num(row.live?.seats_total)}
-                </b>
+                <span>Seats won by listed parties</span>
+                <b>{num(row.live?.seats_allocated)}</b>
+              </div>
+              <div className="stat">
+                <span>Council seats in province</span>
+                <b>{num(row.live?.seats_total)}</b>
               </div>
               <div className="stat">
                 <span>Councils complete</span>
                 <b>
                   {num(row.live?.councils.complete)} / {num(row.live?.councils.expected)}
                 </b>
+              </div>
+              <div className="stat">
+                <span>Councils without a majority</span>
+                <b>{num(row.live?.councils.hung)}</b>
               </div>
             </div>
           </>
