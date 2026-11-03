@@ -1,0 +1,16 @@
+services:
+  ballotwatch:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - lge-data:/data
+    environment:
+      LGE_YEAR: "2026"
+      POLL_LIVE_SECONDS: "30"
+      POLL_IDLE_SECONDS: "120"
+      POLL_QUIET_SECONDS: "600"
+    restart: unless-stopped
+
+volumes:
+  lge-data:

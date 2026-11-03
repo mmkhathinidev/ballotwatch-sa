@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Runtime data (the poller recreates these)
+data/*.sqlite3
+data/*.sqlite3-shm
+data/*.sqlite3-wal
+data-replay/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.log
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# TS build cache
+*.tsbuildinfo

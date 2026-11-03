@@ -1,0 +1,958 @@
+{
+ "generated_at": "2026-11-03T22:08:24+02:00",
+ "registration": {
+  "as_at": "2026-09-29",
+  "source": "https://www.elections.org.za/pw/StatsData/Voter-Registration-Statistics",
+  "total": 29230808,
+  "gender": {
+   "male": 13075078,
+   "female": 16155730
+  },
+  "age_bands": [
+   {
+    "band": "18-19",
+    "male": 308310,
+    "female": 385603
+   },
+   {
+    "band": "20-29",
+    "male": 2155211,
+    "female": 2683749
+   },
+   {
+    "band": "30-39",
+    "male": 3118675,
+    "female": 3656909
+   },
+   {
+    "band": "40-49",
+    "male": 2997361,
+    "female": 3320270
+   },
+   {
+    "band": "50-59",
+    "male": 2212237,
+    "female": 2604700
+   },
+   {
+    "band": "60-69",
+    "male": 1407685,
+    "female": 1928572
+   },
+   {
+    "band": "70-79",
+    "male": 645142,
+    "female": 1033434
+   },
+   {
+    "band": "80+",
+    "male": 230457,
+    "female": 542493
+   }
+  ],
+  "provinces": {
+   "Eastern Cape": 3628934,
+   "Free State": 1533570,
+   "Gauteng": 6751064,
+   "KwaZulu-Natal": 6030969,
+   "Mpumalanga": 2170139,
+   "Northern Cape": 713869,
+   "Limpopo": 3037387,
+   "North West": 1907623,
+   "Western Cape": 3457253
+  }
+ },
+ "elections": {
+  "2011": {
+   "event_id": 197,
+   "report_date": "2021-10-25T15:03:49.2001751+02:00",
+   "registered_voters": 23655046,
+   "votes_cast": 27181857,
+   "valid_votes": 26711498,
+   "spoilt_votes": 470359,
+   "special_votes": 163549,
+   "ballots_cast": 27181857,
+   "turnout": 57.45,
+   "seats": 8433,
+   "seats_expected": 8434,
+   "councils": 234,
+   "wards": 4277,
+   "voting_districts": 20859,
+   "hung": 37,
+   "majority": 197,
+   "parties": [
+    {
+     "id": 7,
+     "abbr": "ANC",
+     "full_name": "AFRICAN NATIONAL CONGRESS",
+     "colour": "#06fb06",
+     "votes": 16548970,
+     "pct": 61.95,
+     "ward_seats": 3352,
+     "pr_seats": 2279,
+     "seats": 5631,
+     "councils_won": 198
+    },
+    {
+     "id": 52,
+     "abbr": "DA",
+     "full_name": "DEMOCRATIC ALLIANCE",
+     "colour": "#f4f400",
+     "votes": 6393890,
+     "pct": 23.94,
+     "ward_seats": 669,
+     "pr_seats": 886,
+     "seats": 1555,
+     "councils_won": 18
+    },
+    {
+     "id": 3,
+     "abbr": "IFP",
+     "full_name": "INKATHA FREEDOM PARTY",
+     "colour": "#FFCA93",
+     "votes": 954021,
+     "pct": 3.57,
+     "ward_seats": 143,
+     "pr_seats": 209,
+     "seats": 352,
+     "councils_won": 5
+    },
+    {
+     "id": -2,
+     "abbr": "OTHER",
+     "full_name": "OTHER",
+     "colour": "#BAE5F2",
+     "votes": 703748,
+     "pct": 2.59,
+     "ward_seats": 12,
+     "pr_seats": 187,
+     "seats": 199,
+     "councils_won": 0
+    },
+    {
+     "id": 591,
+     "abbr": "NFP",
+     "full_name": "NATIONAL FREEDOM PARTY",
+     "colour": "#df8a76",
+     "votes": 644917,
+     "pct": 2.41,
+     "ward_seats": 41,
+     "pr_seats": 183,
+     "seats": 224,
+     "councils_won": 2
+    },
+    {
+     "id": 499,
+     "abbr": "COPE",
+     "full_name": "CONGRESS  OF THE PEOPLE",
+     "colour": "#fc8005",
+     "votes": 570703,
+     "pct": 2.14,
+     "ward_seats": 5,
+     "pr_seats": 230,
+     "seats": 235,
+     "councils_won": 0
+    },
+    {
+     "id": 0,
+     "abbr": "IND",
+     "full_name": "INDEPENDENTS",
+     "colour": "#9EBBD7",
+     "votes": 302243,
+     "pct": 1.13,
+     "ward_seats": 45,
+     "pr_seats": 0,
+     "seats": 45,
+     "councils_won": 0
+    },
+    {
+     "id": 6,
+     "abbr": "UDM",
+     "full_name": "UNITED DEMOCRATIC MOVEMENT",
+     "colour": "#00a39a",
+     "votes": 168351,
+     "pct": 0.63,
+     "ward_seats": 2,
+     "pr_seats": 63,
+     "seats": 65,
+     "councils_won": 0
+    },
+    {
+     "id": 18,
+     "abbr": "ACDP",
+     "full_name": "AFRICAN CHRISTIAN DEMOCRATIC PARTY",
+     "colour": "#9f7b6f",
+     "votes": 165602,
+     "pct": 0.62,
+     "ward_seats": 0,
+     "pr_seats": 40,
+     "seats": 40,
+     "councils_won": 0
+    },
+    {
+     "id": 4,
+     "abbr": "VF PLUS",
+     "full_name": "VRYHEIDSFRONT PLUS",
+     "colour": "#bf7fff",
+     "votes": 120519,
+     "pct": 0.45,
+     "ward_seats": 0,
+     "pr_seats": 38,
+     "seats": 38,
+     "councils_won": 0
+    },
+    {
+     "id": 8,
+     "abbr": "PAC",
+     "full_name": "PAN AFRICANIST CONGRESS OF AZANIA",
+     "colour": "#900090",
+     "votes": 118671,
+     "pct": 0.44,
+     "ward_seats": 1,
+     "pr_seats": 39,
+     "seats": 40,
+     "councils_won": 0
+    },
+    {
+     "id": 45,
+     "abbr": "ICOSA",
+     "full_name": "INDEPENDENT CIVIC ORGANISATION OF SOUTH AFRICA",
+     "colour": "#D0FFE8",
+     "votes": 14596,
+     "pct": 0.05,
+     "ward_seats": 3,
+     "pr_seats": 3,
+     "seats": 6,
+     "councils_won": 1
+    },
+    {
+     "id": 595,
+     "abbr": "KGP",
+     "full_name": "KAROO GEMEENSKAP PARTY",
+     "colour": "#BAE5F2",
+     "votes": 5267,
+     "pct": 0.02,
+     "ward_seats": 3,
+     "pr_seats": 0,
+     "seats": 3,
+     "councils_won": 1
+    }
+   ]
+  },
+  "2016": {
+   "event_id": 402,
+   "report_date": "2017-04-06T11:46:32.7700172+02:00",
+   "registered_voters": 26333353,
+   "votes_cast": 30395359,
+   "valid_votes": 29863671,
+   "spoilt_votes": 531688,
+   "special_votes": 402322,
+   "ballots_cast": 30395359,
+   "turnout": 57.71,
+   "seats": 8646,
+   "seats_expected": 8646,
+   "councils": 213,
+   "wards": 4392,
+   "voting_districts": 22612,
+   "hung": 27,
+   "majority": 186,
+   "parties": [
+    {
+     "id": 7,
+     "abbr": "ANC",
+     "full_name": "AFRICAN NATIONAL CONGRESS",
+     "colour": "#06fb06",
+     "votes": 16099189,
+     "pct": 53.91,
+     "ward_seats": 3414,
+     "pr_seats": 1749,
+     "seats": 5163,
+     "councils_won": 176
+    },
+    {
+     "id": 52,
+     "abbr": "DA",
+     "full_name": "DEMOCRATIC ALLIANCE",
+     "colour": "#f4f400",
+     "votes": 8032294,
+     "pct": 26.9,
+     "ward_seats": 739,
+     "pr_seats": 1043,
+     "seats": 1782,
+     "councils_won": 24
+    },
+    {
+     "id": 945,
+     "abbr": "EFF",
+     "full_name": "ECONOMIC FREEDOM FIGHTERS",
+     "colour": "#ff0000",
+     "votes": 2446662,
+     "pct": 8.19,
+     "ward_seats": 11,
+     "pr_seats": 750,
+     "seats": 761,
+     "councils_won": 0
+    },
+    {
+     "id": 3,
+     "abbr": "IFP",
+     "full_name": "INKATHA FREEDOM PARTY",
+     "colour": "#FFCA93",
+     "votes": 1268808,
+     "pct": 4.25,
+     "ward_seats": 185,
+     "pr_seats": 247,
+     "seats": 432,
+     "councils_won": 7
+    },
+    {
+     "id": -2,
+     "abbr": "OTHER",
+     "full_name": "OTHER",
+     "colour": "#BAE5F2",
+     "votes": 701860,
+     "pct": 2.23,
+     "ward_seats": 11,
+     "pr_seats": 184,
+     "seats": 195,
+     "councils_won": 0
+    },
+    {
+     "id": 0,
+     "abbr": "IND",
+     "full_name": "INDEPENDENTS",
+     "colour": "#9EBBD7",
+     "votes": 341214,
+     "pct": 1.14,
+     "ward_seats": 27,
+     "pr_seats": 0,
+     "seats": 27,
+     "councils_won": 0
+    },
+    {
+     "id": 330,
+     "abbr": "AIC",
+     "full_name": "AFRICAN INDEPENDENT CONGRESS",
+     "colour": "#ff9090",
+     "votes": 234356,
+     "pct": 0.78,
+     "ward_seats": 0,
+     "pr_seats": 55,
+     "seats": 55,
+     "councils_won": 0
+    },
+    {
+     "id": 4,
+     "abbr": "VF PLUS",
+     "full_name": "VRYHEIDSFRONT PLUS",
+     "colour": "#bf7fff",
+     "votes": 228929,
+     "pct": 0.77,
+     "ward_seats": 0,
+     "pr_seats": 67,
+     "seats": 67,
+     "councils_won": 0
+    },
+    {
+     "id": 6,
+     "abbr": "UDM",
+     "full_name": "UNITED DEMOCRATIC MOVEMENT",
+     "colour": "#00a39a",
+     "votes": 167611,
+     "pct": 0.56,
+     "ward_seats": 2,
+     "pr_seats": 57,
+     "seats": 59,
+     "councils_won": 0
+    },
+    {
+     "id": 499,
+     "abbr": "COPE",
+     "full_name": "CONGRESS  OF THE PEOPLE",
+     "colour": "#fc8005",
+     "votes": 130352,
+     "pct": 0.44,
+     "ward_seats": 1,
+     "pr_seats": 44,
+     "seats": 45,
+     "councils_won": 0
+    },
+    {
+     "id": 18,
+     "abbr": "ACDP",
+     "full_name": "AFRICAN CHRISTIAN DEMOCRATIC PARTY",
+     "colour": "#9f7b6f",
+     "votes": 124430,
+     "pct": 0.42,
+     "ward_seats": 0,
+     "pr_seats": 22,
+     "seats": 22,
+     "councils_won": 0
+    },
+    {
+     "id": 1016,
+     "abbr": "F4SD",
+     "full_name": "FORUM 4 SERVICE DELIVERY",
+     "colour": "#02fb81",
+     "votes": 57487,
+     "pct": 0.19,
+     "ward_seats": 0,
+     "pr_seats": 27,
+     "seats": 27,
+     "councils_won": 0
+    },
+    {
+     "id": 45,
+     "abbr": "ICOSA",
+     "full_name": "INDEPENDENT CIVIC ORGANISATION OF SOUTH AFRICA",
+     "colour": "#D0FFE8",
+     "votes": 30479,
+     "pct": 0.1,
+     "ward_seats": 2,
+     "pr_seats": 9,
+     "seats": 11,
+     "councils_won": 1
+    }
+   ]
+  },
+  "2021": {
+   "event_id": 1091,
+   "report_date": "2022-01-15T17:50:57.5263201+02:00",
+   "registered_voters": 26204579,
+   "votes_cast": 23892933,
+   "valid_votes": 23466998,
+   "spoilt_votes": 425935,
+   "special_votes": 586292,
+   "ballots_cast": 23892933,
+   "turnout": 45.59,
+   "seats": 8794,
+   "seats_expected": 8794,
+   "councils": 213,
+   "wards": 4468,
+   "voting_districts": 23148,
+   "hung": 70,
+   "majority": 143,
+   "parties": [
+    {
+     "id": 7,
+     "abbr": "ANC",
+     "full_name": "AFRICAN NATIONAL CONGRESS",
+     "colour": "#06fb06",
+     "votes": 10699300,
+     "pct": 45.59,
+     "ward_seats": 3295,
+     "pr_seats": 1253,
+     "seats": 4548,
+     "councils_won": 167
+    },
+    {
+     "id": 52,
+     "abbr": "DA",
+     "full_name": "DEMOCRATIC ALLIANCE",
+     "colour": "#f4f400",
+     "votes": 5082747,
+     "pct": 21.66,
+     "ward_seats": 703,
+     "pr_seats": 794,
+     "seats": 1497,
+     "councils_won": 24
+    },
+    {
+     "id": 945,
+     "abbr": "EFF",
+     "full_name": "ECONOMIC FREEDOM FIGHTERS",
+     "colour": "#ff0000",
+     "votes": 2419950,
+     "pct": 10.31,
+     "ward_seats": 19,
+     "pr_seats": 963,
+     "seats": 982,
+     "councils_won": 0
+    },
+    {
+     "id": -2,
+     "abbr": "OTHER",
+     "full_name": "OTHER",
+     "colour": "#BAE5F2",
+     "votes": 1825016,
+     "pct": 7.63,
+     "ward_seats": 46,
+     "pr_seats": 575,
+     "seats": 621,
+     "councils_won": 0
+    },
+    {
+     "id": 3,
+     "abbr": "IFP",
+     "full_name": "INKATHA FREEDOM PARTY",
+     "colour": "#FFCA93",
+     "votes": 1324267,
+     "pct": 5.64,
+     "ward_seats": 323,
+     "pr_seats": 222,
+     "seats": 545,
+     "councils_won": 16
+    },
+    {
+     "id": 4,
+     "abbr": "VF PLUS",
+     "full_name": "VRYHEIDSFRONT PLUS",
+     "colour": "#bf7fff",
+     "votes": 549877,
+     "pct": 2.34,
+     "ward_seats": 8,
+     "pr_seats": 213,
+     "seats": 221,
+     "councils_won": 0
+    },
+    {
+     "id": 1511,
+     "abbr": "ACTIONSA",
+     "full_name": "ACTIONSA",
+     "colour": "#BC4542",
+     "votes": 547905,
+     "pct": 2.33,
+     "ward_seats": 1,
+     "pr_seats": 89,
+     "seats": 90,
+     "councils_won": 0
+    },
+    {
+     "id": 0,
+     "abbr": "IND",
+     "full_name": "INDEPENDENTS",
+     "colour": "#9EBBD7",
+     "votes": 406135,
+     "pct": 1.73,
+     "ward_seats": 52,
+     "pr_seats": 0,
+     "seats": 52,
+     "councils_won": 0
+    },
+    {
+     "id": 957,
+     "abbr": "PA",
+     "full_name": "PATRIOTIC ALLIANCE",
+     "colour": "#006ba0",
+     "votes": 226859,
+     "pct": 0.97,
+     "ward_seats": 7,
+     "pr_seats": 68,
+     "seats": 75,
+     "councils_won": 0
+    },
+    {
+     "id": 1318,
+     "abbr": "ATM",
+     "full_name": "AFRICAN TRANSFORMATION MOVEMENT",
+     "colour": "#B0E5FF",
+     "votes": 134434,
+     "pct": 0.57,
+     "ward_seats": 0,
+     "pr_seats": 52,
+     "seats": 52,
+     "councils_won": 0
+    },
+    {
+     "id": 591,
+     "abbr": "NFP",
+     "full_name": "NATIONAL FREEDOM PARTY",
+     "colour": "#df8a76",
+     "votes": 118030,
+     "pct": 0.5,
+     "ward_seats": 10,
+     "pr_seats": 42,
+     "seats": 52,
+     "councils_won": 1
+    },
+    {
+     "id": 6,
+     "abbr": "UDM",
+     "full_name": "UNITED DEMOCRATIC MOVEMENT",
+     "colour": "#00a39a",
+     "votes": 111201,
+     "pct": 0.47,
+     "ward_seats": 1,
+     "pr_seats": 50,
+     "seats": 51,
+     "councils_won": 0
+    },
+    {
+     "id": 45,
+     "abbr": "ICOSA",
+     "full_name": "INDEPENDENT CIVIC ORGANISATION OF SOUTH AFRICA",
+     "colour": "#D0FFE8",
+     "votes": 21277,
+     "pct": 0.09,
+     "ward_seats": 3,
+     "pr_seats": 5,
+     "seats": 8,
+     "councils_won": 1
+    }
+   ]
+  }
+ },
+ "provinces": {
+  "1": {
+   "province_id": 1,
+   "province": "Eastern Cape",
+   "registered_voters": 3253307,
+   "votes_cast": 3017803,
+   "valid_votes": 2951848,
+   "ballots_cast": 3017803,
+   "turnout": 46.38,
+   "seats": 1237,
+   "councils": 33,
+   "hung": 3,
+   "majority": 30,
+   "parties": [
+    {
+     "id": 7,
+     "votes": 1859404,
+     "pct": 62.99,
+     "seats": 955,
+     "councils_won": 31
+    },
+    {
+     "id": 52,
+     "votes": 450127,
+     "pct": 15.25,
+     "seats": 168,
+     "councils_won": 1
+    },
+    {
+     "id": 945,
+     "votes": 232270,
+     "pct": 7.87,
+     "seats": 114,
+     "councils_won": 0
+    }
+   ]
+  },
+  "2": {
+   "province_id": 2,
+   "province": "Free State",
+   "registered_voters": 1413158,
+   "votes_cast": 1278484,
+   "valid_votes": 1254836,
+   "ballots_cast": 1278484,
+   "turnout": 45.23,
+   "seats": 524,
+   "councils": 19,
+   "hung": 4,
+   "majority": 15,
+   "parties": [
+    {
+     "id": 7,
+     "votes": 635087,
+     "pct": 50.61,
+     "seats": 328,
+     "councils_won": 19
+    },
+    {
+     "id": 52,
+     "votes": 235497,
+     "pct": 18.77,
+     "seats": 113,
+     "councils_won": 0
+    },
+    {
+     "id": 945,
+     "votes": 155785,
+     "pct": 12.41,
+     "seats": 83,
+     "councils_won": 0
+    }
+   ]
+  },
+  "3": {
+   "province_id": 3,
+   "province": "Gauteng",
+   "registered_voters": 6195753,
+   "votes_cast": 5385382,
+   "valid_votes": 5311565,
+   "ballots_cast": 5385382,
+   "turnout": 43.46,
+   "seats": 836,
+   "councils": 9,
+   "hung": 8,
+   "majority": 1,
+   "parties": [
+    {
+     "id": 7,
+     "votes": 1915468,
+     "pct": 36.06,
+     "seats": 399,
+     "councils_won": 8
+    },
+    {
+     "id": 52,
+     "votes": 1524251,
+     "pct": 28.7,
+     "seats": 303,
+     "councils_won": 1
+    },
+    {
+     "id": 945,
+     "votes": 631765,
+     "pct": 11.89,
+     "seats": 134,
+     "councils_won": 0
+    }
+   ]
+  },
+  "4": {
+   "province_id": 4,
+   "province": "KwaZulu-Natal",
+   "registered_voters": 5447815,
+   "votes_cast": 5224937,
+   "valid_votes": 5118308,
+   "ballots_cast": 5224937,
+   "turnout": 47.95,
+   "seats": 1435,
+   "councils": 44,
+   "hung": 21,
+   "majority": 23,
+   "parties": [
+    {
+     "id": 7,
+     "votes": 2120994,
+     "pct": 41.44,
+     "seats": 742,
+     "councils_won": 24
+    },
+    {
+     "id": 3,
+     "votes": 1240756,
+     "pct": 24.24,
+     "seats": 527,
+     "councils_won": 16
+    },
+    {
+     "id": 52,
+     "votes": 662433,
+     "pct": 12.94,
+     "seats": 166,
+     "councils_won": 1
+    }
+   ]
+  },
+  "5": {
+   "province_id": 5,
+   "province": "Mpumalanga",
+   "registered_voters": 1903239,
+   "votes_cast": 1615109,
+   "valid_votes": 1583282,
+   "ballots_cast": 1615109,
+   "turnout": 42.43,
+   "seats": 700,
+   "councils": 17,
+   "hung": 3,
+   "majority": 14,
+   "parties": [
+    {
+     "id": 7,
+     "votes": 938907,
+     "pct": 59.3,
+     "seats": 475,
+     "councils_won": 17
+    },
+    {
+     "id": 945,
+     "votes": 240861,
+     "pct": 15.21,
+     "seats": 126,
+     "councils_won": 0
+    },
+    {
+     "id": 52,
+     "votes": 185111,
+     "pct": 11.69,
+     "seats": 99,
+     "councils_won": 0
+    }
+   ]
+  },
+  "6": {
+   "province_id": 6,
+   "province": "Northern Cape",
+   "registered_voters": 622746,
+   "votes_cast": 663326,
+   "valid_votes": 650123,
+   "ballots_cast": 663326,
+   "turnout": 53.26,
+   "seats": 364,
+   "councils": 26,
+   "hung": 10,
+   "majority": 16,
+   "parties": [
+    {
+     "id": 7,
+     "votes": 328625,
+     "pct": 50.55,
+     "seats": 229,
+     "councils_won": 26
+    },
+    {
+     "id": 52,
+     "votes": 129839,
+     "pct": 19.97,
+     "seats": 88,
+     "councils_won": 0
+    },
+    {
+     "id": 945,
+     "votes": 68032,
+     "pct": 10.46,
+     "seats": 47,
+     "councils_won": 0
+    }
+   ]
+  },
+  "7": {
+   "province_id": 7,
+   "province": "Limpopo",
+   "registered_voters": 2585080,
+   "votes_cast": 2288999,
+   "valid_votes": 2247577,
+   "ballots_cast": 2288999,
+   "turnout": 44.27,
+   "seats": 1020,
+   "councils": 22,
+   "hung": 2,
+   "majority": 20,
+   "parties": [
+    {
+     "id": 7,
+     "votes": 1534342,
+     "pct": 68.27,
+     "seats": 787,
+     "councils_won": 22
+    },
+    {
+     "id": 945,
+     "votes": 320801,
+     "pct": 14.27,
+     "seats": 168,
+     "councils_won": 0
+    },
+    {
+     "id": 52,
+     "votes": 122583,
+     "pct": 5.45,
+     "seats": 65,
+     "councils_won": 0
+    }
+   ]
+  },
+  "8": {
+   "province_id": 8,
+   "province": "North West",
+   "registered_voters": 1671551,
+   "votes_cast": 1404330,
+   "valid_votes": 1369486,
+   "ballots_cast": 1404330,
+   "turnout": 42.01,
+   "seats": 682,
+   "councils": 18,
+   "hung": 3,
+   "majority": 15,
+   "parties": [
+    {
+     "id": 7,
+     "votes": 759038,
+     "pct": 55.43,
+     "seats": 456,
+     "councils_won": 18
+    },
+    {
+     "id": 945,
+     "votes": 226223,
+     "pct": 16.52,
+     "seats": 136,
+     "councils_won": 0
+    },
+    {
+     "id": 52,
+     "votes": 156029,
+     "pct": 11.39,
+     "seats": 90,
+     "councils_won": 0
+    }
+   ]
+  },
+  "9": {
+   "province_id": 9,
+   "province": "Western Cape",
+   "registered_voters": 3111930,
+   "votes_cast": 3014563,
+   "valid_votes": 2979973,
+   "ballots_cast": 3014563,
+   "turnout": 48.44,
+   "seats": 590,
+   "councils": 25,
+   "hung": 16,
+   "majority": 9,
+   "parties": [
+    {
+     "id": 52,
+     "votes": 1616877,
+     "pct": 54.26,
+     "seats": 405,
+     "councils_won": 21
+    },
+    {
+     "id": 7,
+     "votes": 607435,
+     "pct": 20.38,
+     "seats": 177,
+     "councils_won": 2
+    },
+    {
+     "id": 45,
+     "votes": 20921,
+     "pct": 0.7,
+     "seats": 8,
+     "councils_won": 1
+    }
+   ]
+  }
+ },
+ "structure": {
+  "wards": 4468,
+  "voting_districts": 23148,
+  "councils": 213,
+  "seats": 8794
+ },
+ "sources": [
+  {
+   "label": "IEC LGE 2011 bundle",
+   "url": "https://results.elections.org.za/dashboards/lge/MapsJason/2011/EEID197LiteMapsNational.js",
+   "status": 200
+  },
+  {
+   "label": "IEC LGE 2016 bundle",
+   "url": "https://results.elections.org.za/dashboards/lge/MapsJason/2016/EEID402LiteMapsNational.js",
+   "status": 200
+  },
+  {
+   "label": "IEC LGE 2021 bundle",
+   "url": "https://results.elections.org.za/dashboards/lge/MapsJason/2021/EEID1091LiteMapsNational.js",
+   "status": 200
+  },
+  {
+   "label": "IEC LGE 2026 bundle",
+   "url": "https://results.elections.org.za/dashboards/lge/MapsJason/2026/EEID1887LiteMapsNational.js",
+   "status": 200
+  }
+ ],
+ "structure_2026": {
+  "wards": 4485,
+  "voting_districts": 23696,
+  "councils": 213,
+  "seats": 8824,
+  "registered_voters": 29230808,
+  "event_id": 1887,
+  "report_date": "2026-10-30T00:33:08.0228836+02:00"
+ }
+}
