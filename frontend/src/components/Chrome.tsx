@@ -1,39 +1,6 @@
 import { FeedHealth, Meta } from "../lib/api";
-import { clock, duration, relative, sast } from "../lib/format";
+import { duration, relative, sast } from "../lib/format";
 import { useNow } from "../lib/useDashboard";
-
-export function TopBar({ meta, error }: { meta: Meta | null; error: string | null }) {
-  const feed = meta?.feed;
-  return (
-    <div className="topbar">
-      <div className="topbar-inner">
-        <div className="brand">
-          <div className="brand-mark">BW</div>
-          <div className="brand-text">
-            <span className="brand-name">BallotWatch SA</span>
-            <span className="brand-sub">Local Government Elections · 2026</span>
-          </div>
-        </div>
-        <div className="topbar-right">
-          <FeedPill feed={feed} />
-          <span className="pill">
-            IEC report <strong>{sast(meta?.report_date)}</strong>
-          </span>
-          <span className="pill hide-sm">
-            Polling day <strong>Wed 4 Nov</strong>
-          </span>
-          {meta?.replay ? <span className="pill warn">replay {meta.year}</span> : null}
-          {meta?.static ? (
-            <span className="pill warn" title="Static snapshot — refreshed by the publishing job">
-              snapshot {clock(meta.generated_at)}
-            </span>
-          ) : null}
-          {error ? <span className="pill bad">{error}</span> : null}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function FeedPill({ feed }: { feed?: FeedHealth }) {
   if (!feed) return <span className="pill warn">connecting</span>;
