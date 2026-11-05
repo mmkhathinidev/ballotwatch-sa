@@ -64,6 +64,20 @@ Two caveats worth stating plainly:
 - **Party 1909** appears in the 2026 event bundle but in no published party list,
   so it is displayed by ID rather than guessed at.
 
+### The IEC's "OTHER" line is a bucket, not a party
+
+The results feed lists only the parties carrying the contest and folds every
+other party into one `OTHER` row (party ID `-2`). At 10.56% of counted votes in
+2026 it arrived third in a naive sort, which reads as a party result and pushes
+the EFF and the Patriotic Alliance down the ranking.
+
+BallotWatch flags that row as residual in the API, sorts it behind every real
+party, draws it in a neutral hatched grey, labels it *Other* and gives it no
+rank or seat count (the IEC attributes seats to the individual member parties,
+not to the bucket). It is never dropped from a chart, because votes do not
+disappear: 546 parties contested 2026, and in 2021 the same bucket held 7.63% of
+the vote and 621 council seats.
+
 ## Architecture
 
 ```
