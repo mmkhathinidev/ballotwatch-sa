@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from app import iec, prepoll, store
+from app import iec, prepoll, store, tail
 
 PARTIES = {
     0: {"id": 0, "name": "IND", "full_name": "INDEPENDENTS", "colour": "#9EBBD7"},
@@ -127,6 +127,37 @@ class NationalViewTests(unittest.TestCase):
         self.assertFalse(view["loaded"])
         self.assertEqual(view["seats_allocated"], 0)
         self.assertEqual(view["turnout"], 0)
+
+
+class TailTests(unittest.TestCase):
+    def test_other_block_excludes_individually_listed_parties(self):
+        # The ward-level tally is national and complete; the "Other" block must
+        # still exclude the parties the IEC lists by name, or the number would
+        # double-count them against the national chart.
+        tail_data = {
+            "coverage": {"valid_votes": 1000},
+            "parties": [
+                {"id": 7, "abbr": "ANC", "name": "ANC", "votes": 600, "pct": 60.0},
+                {"id": 3, "abbr": "UDM", "name": "UDM", "votes": 100, "pct": 10.0},
+                {"id": 9, "abbr": "XYZ", "name": "XYZ", "votes": 50, "pct": 5.0},
+            ],
+        }
+        national = {
+            "parties": [
+                {"id": 7, "abbr": "ANC", "residual": False},
+                {"id": -2, "abbr": "OTHER", "residual": True, "votes": 145, "pct": 14.5},
+            ]
+        }
+        out = tail.with_other(tail_data, national)
+        self.assertEqual(out["other"]["parties"], 2)
+        self.assertEqual(out["other"]["votes"], 150)
+        self.assertEqual([p["abbr"] for p in out["other"]["largest"]], ["UDM", "XYZ"])
+        self.assertAlmostEqual(out["other"]["pct"], 15.0, places=2)
+        self.assertAlmostEqual(out["other"]["delta_pct"], 3.45, places=2)
+
+    def test_other_block_without_feed_row_is_honest(self):
+        out = tail.with_other({"coverage": {"valid_votes": 100}, "parties": [{"id": 9, "votes": 10, "pct": 10.0}]}, {"parties": []})
+        self.assertIsNone(out["other"]["delta_pct"])
 
 
 class ProvinceViewTests(unittest.TestCase):

@@ -42,6 +42,7 @@ BallotWatch keeps three things that are usually lost:
 | Data | Source | Access |
 | --- | --- | --- |
 | 2026 live results | IEC results dashboard event bundle, `EEID1887LiteMapsNational.js` | Public, key-less JSON |
+| 2026 ward-level party votes | IEC per-municipality bundles, `EEID1887Munic<code>.js` (213 files) | Public, key-less JSON |
 | 2011 / 2016 / 2021 baselines | Same dashboard, historical event bundles | Public, key-less JSON |
 | Party names and colours | IEC `PartyList.js` (2024, 2021) | Public |
 | Voter roll | IEC Voter Registration Statistics (as at 29 Sep 2026) | Public page, parsed and reconciled |
@@ -79,10 +80,14 @@ disappear: 546 parties contested 2026, and in 2021 the same bucket held 7.63% of
 the vote and 621 council seats.
 
 A "Peek inside Other" link under the chart opens a modal sheet with the bucket's
-composition: its current share, the 2021 final, and the ten largest 2021 members
-(none above 0.61%). The 2026 members cannot be itemised — the public bundle
-carries no per-party tally for the tail and the IEC's credentialed API is issued
-by request — so the sheet says so rather than inventing a breakdown.
+composition: its current share, how many parties are in it, and a live list of
+the largest of them, searchable across every party with votes. Those numbers are
+not estimated — `backend/app/tail.py` sums the party ballot from every ward in
+all 213 municipal bundles, and `scripts/ingest_tail.py` refreshes that cache
+before each publish (only municipalities whose report timestamp moved are
+re-fetched, so a typical pass is nine small requests). The reconstruction is
+checked against the IEC's own aggregate row and the gap is shown in the sheet;
+final 2021 figures are kept alongside for scale.
 
 ## Architecture
 

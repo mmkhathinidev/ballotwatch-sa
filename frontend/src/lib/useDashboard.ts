@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, isStatic, Meta, National, Prepoll, Province, Sources } from "./api";
+import { api, isStatic, Meta, National, Prepoll, Province, Sources, Tail } from "./api";
 
 type State = {
   meta: Meta | null;
@@ -7,6 +7,7 @@ type State = {
   provinces: Province[];
   prepoll: Prepoll | null;
   sources: Sources | null;
+  tail: Tail | null;
   error: string | null;
   loading: boolean;
   lastFetch: number | null;
@@ -19,6 +20,7 @@ export function useDashboard() {
     provinces: [],
     prepoll: null,
     sources: null,
+    tail: null,
     error: null,
     loading: true,
     lastFetch: null,
@@ -29,12 +31,13 @@ export function useDashboard() {
     if (inFlight.current) return;
     inFlight.current = true;
     try {
-      const [meta, national, provinces, prepoll, sources] = await Promise.all([
+      const [meta, national, provinces, prepoll, sources, tail] = await Promise.all([
         api.meta(),
         api.national(),
         api.provinces(),
         api.prepoll().catch(() => null),
         api.sources().catch(() => null),
+        api.tail().catch(() => null),
       ]);
       setState({
         meta,
@@ -42,6 +45,7 @@ export function useDashboard() {
         provinces: provinces.provinces,
         prepoll,
         sources,
+        tail,
         error: null,
         loading: false,
         lastFetch: Date.now(),

@@ -94,6 +94,11 @@ publish_with_retry() {
 
 {
   echo "=== $(date -Iseconds) publish start ==="
+  # Rebuild the per-party long tail from ward-level results before exporting.
+  # Best-effort by design: if the ingest fails, the exporter folds in the last
+  # good tail and the site still publishes on time.
+  timeout 300 "${PYTHON}" backend/scripts/ingest_tail.py >> "${LOG}" 2>&1 \
+    || echo "!! tail ingest failed at $(date -Iseconds); publishing last good tail" >> "${LOG}"
   BEFORE="$(git ls-remote --heads origin gh-pages 2>/dev/null | awk '{print $1}')"
   if publish_with_retry; then
     echo "=== $(date -Iseconds) publish done ==="

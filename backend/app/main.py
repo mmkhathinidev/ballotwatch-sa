@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import iec, prepoll, store
+from . import iec, prepoll, store, tail
 from .config import (
     CURRENT_EVENT,
     CURRENT_YEAR,
@@ -187,6 +187,15 @@ async def rebuild_prepoll():
 @app.get("/api/parties")
 async def parties():
     return {"parties": sorted(store.get_parties().values(), key=lambda p: p["name"])}
+
+
+@app.get("/api/tail")
+async def tail_results():
+    """Per-party national totals rebuilt from ward-level results."""
+    data = tail.read()
+    if not data:
+        raise HTTPException(503, "Ward-level tail not ingested yet")
+    return tail.with_other(data, poller.national())
 
 
 @app.get("/api/sources")

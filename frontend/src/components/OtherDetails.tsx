@@ -1,16 +1,43 @@
-import { useRef } from "react";
+import { useMemo, useRef, useState } from "react";
+import type { Tail } from "../lib/api";
 import { num, pct } from "../lib/format";
 import { TAIL_2021, TAIL_2021_FACTS } from "../lib/tail2021";
 
 // A drill-down for the IEC's residual "OTHER" line: hidden behind one text
 // link so the page stays quiet, opened only when someone is curious enough.
-// It shows the bucket's real shape from 2021, when the Commission published
-// enough detail to measure it, and states plainly what the live feed withholds.
+// The 2026 list is not an estimate — it is summed from the party ballot in
+// every ward across all 213 municipalities (see backend/app/tail.py).
 
-export function OtherDetails({ share, votes }: { share: number; votes: number }) {
+type Row = { id?: number; abbr: string; name: string; votes?: number; pct: number };
+
+export function OtherDetails({
+  share,
+  votes,
+  tail,
+}: {
+  share: number;
+  votes: number;
+  tail?: Tail | null;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
-  const max = Math.max(0.01, ...TAIL_2021.map((p) => p.pct));
+  const [showAll, setShowAll] = useState(false);
+  const [query, setQuery] = useState("");
   const f = TAIL_2021_FACTS;
+  const other = tail?.other;
+
+  const rows: Row[] = other
+    ? other.largest
+    : TAIL_2021.map((p) => ({ abbr: p.abbr, name: p.name, pct: p.pct }));
+  const max = Math.max(0.01, ...rows.map((p) => p.pct));
+
+  const filtered = useMemo(() => {
+    const all = other?.members ?? [];
+    const q = query.trim().toLowerCase();
+    if (!q) return all;
+    return all.filter(
+      (p) => p.abbr.toLowerCase().includes(q) || p.name.toLowerCase().includes(q),
+    );
+  }, [other, query]);
 
   return (
     <>
@@ -39,7 +66,7 @@ export function OtherDetails({ share, votes }: { share: number; votes: number })
         <div className="sheet-body">
           <p className="sheet-lede">
             The IEC lists the parties carrying the contest and folds every other party into one line.
-            “Other” is that line — not a party, and not a single result. Right now it holds{" "}
+            “Other” is that line — not a party, and not a single result. It currently holds{" "}
             <b>
               {pct(share)} of counted votes ({num(votes)})
             </b>
@@ -48,67 +75,129 @@ export function OtherDetails({ share, votes }: { share: number; votes: number })
 
           <div className="sheet-stats">
             <div className="stat">
-              <span>2026 so far</span>
+              <span>Inside Other now</span>
               <b>{pct(share)}</b>
               <em>{num(votes)} votes</em>
             </div>
             <div className="stat">
-              <span>2021 final</span>
-              <b>{f.bucketPct.toFixed(2)}%</b>
-              <em>{num(f.bucketVotes)} votes</em>
+              <span>Parties in it</span>
+              <b>{other ? num(other.parties) : "—"}</b>
+              <em>{other ? "with votes" : "counting"}</em>
             </div>
             <div className="stat">
-              <span>Seats in 2021</span>
-              <b>{num(f.bucketSeats)}</b>
-              <em>of 8,794</em>
+              <span>2021 bucket</span>
+              <b>{f.bucketPct.toFixed(2)}%</b>
+              <em>{num(f.bucketSeats)} seats</em>
             </div>
           </div>
 
-          <h4>The last time it could be measured</h4>
-          <p className="sheet-note">
-            {num(f.partiesContested)} parties contested 2021. Twelve were listed individually; the
-            rest shared {f.bucketPct.toFixed(2)}% of the vote. These were the largest members — no
-            single party inside the bucket broke {f.largest.toFixed(2)}%.
-          </p>
+          <h4>{other ? "The largest parties inside it — 2026 count" : "The last time it could be measured"}</h4>
+          {other ? (
+            <p className="sheet-note">
+              Rebuilt from the party ballot in every ward across all{" "}
+              {tail?.coverage.municipalities ?? 0} municipalities, not estimated from the national
+              line. These are the twelve largest; the rest are searchable below.
+            </p>
+          ) : (
+            <p className="sheet-note">
+              {num(f.partiesContested)} parties contested 2021. Twelve were listed individually; the
+              rest shared {f.bucketPct.toFixed(2)}% of the vote. No single party inside the bucket
+              broke {f.largest.toFixed(2)}%.
+            </p>
+          )}
 
           <div className="tail-list">
-            {TAIL_2021.map((p) => (
-              <div className="tail-row" key={p.abbr}>
+            {rows.map((p) => (
+              <div className="tail-row" key={`${p.abbr}-${p.name}`}>
                 <span className="tail-name">
                   <b>{p.abbr}</b>
                   <em>{p.name}</em>
                 </span>
                 <span className="bar-track">
-                  <span className="bar-fill" style={{ width: `${(p.pct / max) * 100}%`, display: "block" }} />
+                  <span
+                    className="bar-fill"
+                    style={{ width: `${(p.pct / max) * 100}%`, display: "block" }}
+                  />
                 </span>
-                <span className="tail-value">{p.pct.toFixed(2)}%</span>
+                <span className="tail-value">{p.pct >= 0.5 ? p.pct.toFixed(1) : p.pct.toFixed(2)}%</span>
               </div>
             ))}
             <div className="tail-foot">
-              …and roughly 300 further parties, each below 0.1% nationally — many of them local civic
-              movements that win a seat or two in one municipality.
+              {other ? (
+                <>
+                  {num(other.parties)} parties with votes, {num(other.votes)} combined. The IEC's own
+                  headline row reads {num(other.feed_votes)}
+                  {other.delta_pct !== null
+                    ? ` — a ${Math.abs(other.delta_pct).toFixed(1)}% gap, which is this rebuild running a few minutes behind the national line`
+                    : ""}
+                  .
+                </>
+              ) : (
+                <>
+                  …and roughly 300 further parties, each below 0.1% nationally — many of them local
+                  civic movements that win a seat or two in one municipality.
+                </>
+              )}
             </div>
           </div>
 
-          <h4>Why 2026 can’t be itemised here yet</h4>
+          {other ? (
+            <div className="tail-actions">
+              <button type="button" className="tab" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll}>
+                {showAll ? "Hide the full list" : `Search all ${num(other.parties)} parties`}
+              </button>
+            </div>
+          ) : null}
+
+          {other && showAll ? (
+            <>
+              <input
+                className="tail-search"
+                type="search"
+                placeholder="Filter by party name or abbreviation…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                aria-label="Filter the parties inside Other"
+              />
+              <div className="tail-table">
+                {filtered.slice(0, 200).map((p) => (
+                  <div className="tail-trow" key={p.id}>
+                    <span>{p.abbr}</span>
+                    <span className="tail-tname">{p.name}</span>
+                    <span>{num(p.votes)}</span>
+                    <span>{p.pct.toFixed(2)}%</span>
+                  </div>
+                ))}
+                {filtered.length === 0 ? <div className="tail-foot">No party matches that.</div> : null}
+                {filtered.length > 200 ? (
+                  <div className="tail-foot">Showing the first 200 matches — keep typing to narrow it.</div>
+                ) : null}
+              </div>
+            </>
+          ) : null}
+
+          <h4>How this is built</h4>
           <p className="sheet-note">
-            The public results bundle publishes one aggregate row for the tail; there is no per-party
-            tally in it, and the IEC’s credentialed API (which does carry that detail) is issued by
-            request. This site will list the members with their own vote counts once ward-level
-            results are ingested — until then it shows the aggregate rather than guess at a
-            breakdown.
+            The national bundle carries no per-party tally for the tail, so this site rebuilds one:
+            each municipal bundle holds a party ballot in every ward, and the wards are summed
+            {tail
+              ? ` (${num(tail.coverage.wards_with_votes)} of ${num(tail.coverage.wards_expected)} wards have votes so far)`
+              : ""}
+            . Those same parties still add up to the IEC's national total — that reconciliation is
+            the check that the reconstruction is sound.
           </p>
 
           <p className="sheet-source">
-            2021 figures: IEC national results, as tabulated on{" "}
+            Ward-level figures: IEC per-municipality bundles at results.elections.org.za. 2021
+            comparison: IEC national results, as tabulated on{" "}
             <a
               href="https://en.wikipedia.org/wiki/2021_South_African_municipal_elections"
               target="_blank"
               rel="noreferrer"
             >
-              Wikipedia — 2021 South African municipal elections
+              Wikipedia
             </a>
-            . 2026 live figures come from the IEC event bundle.
+            .
           </p>
         </div>
       </dialog>

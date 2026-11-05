@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "backend"))
 
 from app import iec, prepoll, store  # noqa: E402
+from app import tail as tail_mod  # noqa: E402
 from app.config import (  # noqa: E402
     CURRENT_EVENT,
     CURRENT_YEAR,
@@ -65,6 +66,12 @@ async def build_api(poller: Poller) -> dict[str, Any]:
         else 99
     )
     generated = datetime.now(SAST).isoformat(timespec="seconds")
+
+    # The ward-level ingest runs on its own schedule (see scripts/ingest_tail.py);
+    # the exporter only folds the latest result in, so a slow ingest can never
+    # stall a publish.
+    span_tail = tail_mod.read()
+    span_tail = tail_mod.with_other(span_tail, national) if span_tail else None
 
     meta = {
         "app": "BallotWatch SA",
@@ -132,6 +139,7 @@ async def build_api(poller: Poller) -> dict[str, Any]:
         "prepoll": baseline,
         "sources": sources,
         "history": {"points": store.timeline(CURRENT_EVENT)},
+        "tail": span_tail,
     }
 
 
@@ -159,6 +167,8 @@ async def main(out: Path, dist: Path) -> int:
         print(f"warning: no SPA build at {dist}; exporting JSON only", file=sys.stderr)
 
     for name, payload in payloads.items():
+        if payload is None:
+            continue
         write(out / "api" / f"{name}.json", payload)
 
     # 404 fallback for GitHub Pages / static hosts on deep links

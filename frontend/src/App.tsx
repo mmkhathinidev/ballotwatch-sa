@@ -17,7 +17,7 @@ import { compact, num, sast } from "./lib/format";
 import { useDashboard } from "./lib/useDashboard";
 
 export default function App() {
-  const { meta, national, provinces, prepoll, sources, error, loading, reload } = useDashboard();
+  const { meta, national, provinces, prepoll, sources, tail, error, loading, reload } = useDashboard();
   const [selected, setSelected] = useState<string | null>(null);
 
   const { rows, meta: partyMeta } = useProvinceRows(prepoll, provinces);
@@ -132,7 +132,7 @@ export default function App() {
           </div>
 
           <div className="two-col">
-            <PartyChart parties={chart.parties} caption={chart.caption} />
+            <PartyChart parties={chart.parties} caption={chart.caption} tail={tail} />
             <div className="stack">
               <ProgressPanel national={national} />
               <IntegrityPanel national={national} />

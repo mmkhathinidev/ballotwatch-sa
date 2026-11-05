@@ -181,6 +181,39 @@ export type Prepoll = {
   sources: { label: string; url: string; status: number }[];
 };
 
+export type TailParty = {
+  id: number;
+  abbr: string;
+  name: string;
+  votes: number;
+  pct: number;
+};
+
+export type Tail = {
+  generated_at: string;
+  source: string;
+  method: string;
+  coverage: {
+    municipalities: number;
+    municipalities_cached: number;
+    refetched: number;
+    wards_with_votes: number;
+    wards_expected: number;
+    valid_votes: number;
+  };
+  parties: TailParty[];
+  other?: {
+    parties: number;
+    votes: number;
+    pct: number;
+    feed_votes: number;
+    feed_pct: number;
+    delta_pct: number | null;
+    largest: TailParty[];
+    members: TailParty[];
+  };
+};
+
 export type Sources = {
   primary: { name: string; url: string; note: string; event_id: number };
   official_api: { name: string; url: string; note: string };
@@ -200,6 +233,7 @@ const STATIC_PATHS: Record<string, string> = {
   "/api/live/provinces": "api/provinces.json",
   "/api/prepoll": "api/prepoll.json",
   "/api/sources": "api/sources.json",
+  "/api/tail": "api/tail.json",
 };
 
 async function get<T>(path: string): Promise<T> {
@@ -215,4 +249,5 @@ export const api = {
   provinces: () => get<{ count: number; provinces: Province[] }>("/api/live/provinces"),
   prepoll: () => get<Prepoll>("/api/prepoll"),
   sources: () => get<Sources>("/api/sources"),
+  tail: () => get<Tail>("/api/tail"),
 };
