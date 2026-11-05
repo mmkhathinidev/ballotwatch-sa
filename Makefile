@@ -1,4 +1,4 @@
-.PHONY: help install build run dev test static serve-static publish replay docker clean
+.PHONY: help install build run dev test static serve-static publish replay tail docker clean
 
 help:
 	@echo "install   install backend + frontend dependencies"
@@ -9,6 +9,7 @@ help:
 	@echo "static    build the static (GitHub Pages / shared hosting) export"
 	@echo "publish   push the static build to the gh-pages branch"
 	@echo "replay    serve a replay of the 2021 election on :8001"
+	@echo "tail      rebuild the ward-level party tail (data/tail.json)"
 	@echo "docker    build and run with docker compose"
 	@echo "clean     remove build artefacts and the local database"
 
@@ -39,6 +40,9 @@ dev:
 
 replay:
 	cd backend && LGE_YEAR=2021 LGE_DATA_DIR=../data-replay python3 -m uvicorn app.main:app --port 8001
+
+tail:
+	backend/.venv/bin/python3 backend/scripts/ingest_tail.py
 
 test:
 	cd backend && python3 -m unittest discover -s tests -v
