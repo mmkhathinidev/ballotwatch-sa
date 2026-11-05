@@ -1,43 +1,34 @@
 import { useMemo, useRef, useState } from "react";
 import type { Tail } from "../lib/api";
 import { num, pct } from "../lib/format";
-import { TAIL_2021, TAIL_2021_FACTS } from "../lib/tail2021";
+import type { Series } from "../lib/series";
+import { CHART_THRESHOLD } from "../lib/series";
+import { TAIL_2021_FACTS } from "../lib/tail2021";
 
-// A drill-down for the IEC's residual "OTHER" line: hidden behind one text
-// link so the page stays quiet, opened only when someone is curious enough.
-// The 2026 list is not an estimate — it is summed from the party ballot in
-// every ward across all 213 municipalities (see backend/app/tail.py).
+// Drill-down for the "Other" bucket: every party below the chart threshold,
+// hidden behind one text link so the page stays quiet. The 2026 numbers are
+// summed from the party ballot in every ward across all 213 municipalities
+// (see backend/app/tail.py), not estimated from the national line.
 
-type Row = { id?: number; abbr: string; name: string; votes?: number; pct: number };
-
-export function OtherDetails({
-  share,
-  votes,
-  tail,
-}: {
-  share: number;
-  votes: number;
-  tail?: Tail | null;
-}) {
+export function OtherDetails({ series, tail }: { series: Series; tail?: Tail | null }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [showAll, setShowAll] = useState(false);
   const [query, setQuery] = useState("");
   const f = TAIL_2021_FACTS;
-  const other = tail?.other;
 
-  const rows: Row[] = other
-    ? other.largest
-    : TAIL_2021.map((p) => ({ abbr: p.abbr, name: p.name, pct: p.pct }));
-  const max = Math.max(0.01, ...rows.map((p) => p.pct));
+  const members = series.bucket.parties;
+  const top = members.slice(0, 12);
+  // Scale to the threshold, not the biggest member: a 0.92% party should read
+  // as "almost at the line", not as a full-length bar.
+  const max = Math.max(CHART_THRESHOLD, ...top.map((p) => p.pct));
 
   const filtered = useMemo(() => {
-    const all = other?.members ?? [];
     const q = query.trim().toLowerCase();
-    if (!q) return all;
-    return all.filter(
+    if (!q) return members;
+    return members.filter(
       (p) => p.abbr.toLowerCase().includes(q) || p.name.toLowerCase().includes(q),
     );
-  }, [other, query]);
+  }, [members, query]);
 
   return (
     <>
@@ -55,7 +46,7 @@ export function OtherDetails({
       >
         <div className="sheet-head">
           <div>
-            <div className="sheet-eyebrow">Residual line · IEC party ballot</div>
+            <div className="sheet-eyebrow">Residual bucket · IEC party ballot</div>
             <h3 id="other-sheet-title">Inside “Other”</h3>
           </div>
           <button type="button" className="sheet-close" onClick={() => ref.current?.close()} aria-label="Close">
@@ -65,50 +56,42 @@ export function OtherDetails({
 
         <div className="sheet-body">
           <p className="sheet-lede">
-            The IEC lists the parties carrying the contest and folds every other party into one line.
-            “Other” is that line — not a party, and not a single result. It currently holds{" "}
+            On this site “Other” means every party under <b>{CHART_THRESHOLD}%</b> of the national
+            vote. Together they hold{" "}
             <b>
-              {pct(share)} of counted votes ({num(votes)})
+              {pct(series.bucket.pct)} — {num(series.bucket.votes)} votes
             </b>
-            , which is why it is drawn on the chart but never ranked.
+            , which is why they are drawn as one bar and never ranked.
           </p>
 
           <div className="sheet-stats">
             <div className="stat">
-              <span>Inside Other now</span>
-              <b>{pct(share)}</b>
-              <em>{num(votes)} votes</em>
+              <span>Bucket share</span>
+              <b>{pct(series.bucket.pct)}</b>
+              <em>{num(series.bucket.votes)} votes</em>
             </div>
             <div className="stat">
               <span>Parties in it</span>
-              <b>{other ? num(other.parties) : "—"}</b>
-              <em>{other ? "with votes" : "counting"}</em>
+              <b>{num(series.bucket.count)}</b>
+              <em>below {CHART_THRESHOLD}%</em>
             </div>
             <div className="stat">
-              <span>2021 bucket</span>
+              <span>2021 comparison</span>
               <b>{f.bucketPct.toFixed(2)}%</b>
               <em>{num(f.bucketSeats)} seats</em>
             </div>
           </div>
 
-          <h4>{other ? "The largest parties inside it — 2026 count" : "The last time it could be measured"}</h4>
-          {other ? (
-            <p className="sheet-note">
-              Rebuilt from the party ballot in every ward across all{" "}
-              {tail?.coverage.municipalities ?? 0} municipalities, not estimated from the national
-              line. These are the twelve largest; the rest are searchable below.
-            </p>
-          ) : (
-            <p className="sheet-note">
-              {num(f.partiesContested)} parties contested 2021. Twelve were listed individually; the
-              rest shared {f.bucketPct.toFixed(2)}% of the vote. No single party inside the bucket
-              broke {f.largest.toFixed(2)}%.
-            </p>
-          )}
+          <h4>The largest parties inside it</h4>
+          <p className="sheet-note">
+            Rebuilt from the party ballot in every ward across all{" "}
+            {tail?.coverage.municipalities ?? 213} municipalities. These are the twelve largest; the
+            rest are searchable below.
+          </p>
 
           <div className="tail-list">
-            {rows.map((p) => (
-              <div className="tail-row" key={`${p.abbr}-${p.name}`}>
+            {top.map((p) => (
+              <div className="tail-row" key={p.id}>
                 <span className="tail-name">
                   <b>{p.abbr}</b>
                   <em>{p.name}</em>
@@ -116,40 +99,27 @@ export function OtherDetails({
                 <span className="bar-track">
                   <span
                     className="bar-fill"
-                    style={{ width: `${(p.pct / max) * 100}%`, display: "block" }}
+                    style={{ width: `${(p.pct / max) * 100}%`, background: p.colour, display: "block" }}
                   />
                 </span>
-                <span className="tail-value">{p.pct >= 0.5 ? p.pct.toFixed(1) : p.pct.toFixed(2)}%</span>
+                <span className="tail-value">{p.pct.toFixed(2)}%</span>
               </div>
             ))}
             <div className="tail-foot">
-              {other ? (
-                <>
-                  {num(other.parties)} parties with votes, {num(other.votes)} combined. The IEC's own
-                  headline row reads {num(other.feed_votes)}
-                  {other.delta_pct !== null
-                    ? ` — a ${Math.abs(other.delta_pct).toFixed(1)}% gap, which is this rebuild running a few minutes behind the national line`
-                    : ""}
-                  .
-                </>
-              ) : (
-                <>
-                  …and roughly 300 further parties, each below 0.1% nationally — many of them local
-                  civic movements that win a seat or two in one municipality.
-                </>
-              )}
+              {num(series.bucket.count)} parties, {num(series.bucket.votes)} votes combined.
+              {series.iecOther
+                ? ` The IEC's own OTHER line reads ${num(series.iecOther.votes)} at this moment — narrower, because it only hides parties it does not name, while this bucket also folds in the named parties that sit below ${CHART_THRESHOLD}%.`
+                : ""}
             </div>
           </div>
 
-          {other ? (
-            <div className="tail-actions">
-              <button type="button" className="tab" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll}>
-                {showAll ? "Hide the full list" : `Search all ${num(other.parties)} parties`}
-              </button>
-            </div>
-          ) : null}
+          <div className="tail-actions">
+            <button type="button" className="tab" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll}>
+              {showAll ? "Hide the full list" : `Search all ${num(series.bucket.count)} parties`}
+            </button>
+          </div>
 
-          {other && showAll ? (
+          {showAll ? (
             <>
               <input
                 className="tail-search"
@@ -183,8 +153,8 @@ export function OtherDetails({
             {tail
               ? ` (${num(tail.coverage.wards_with_votes)} of ${num(tail.coverage.wards_expected)} wards have votes so far)`
               : ""}
-            . Those same parties still add up to the IEC's national total — that reconciliation is
-            the check that the reconstruction is sound.
+            . Those parties still add up to the IEC's national total — that reconciliation is the
+            check that the reconstruction is sound.
           </p>
 
           <p className="sheet-source">

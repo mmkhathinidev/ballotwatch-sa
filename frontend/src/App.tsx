@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { IntegrityPanel, NationalBoard, ProgressPanel } from "./components/LivePanel";
 import { Metros } from "./components/Metros";
-import { PartyChart, type ChartParty } from "./components/PartyChart";
+import { PartyChart } from "./components/PartyChart";
 import {
   ProvinceDetail,
   ProvinceList,
@@ -14,6 +14,7 @@ import { SearchPanel } from "./components/SearchPanel";
 import { Footer, SourcesPanel } from "./components/SourcesPanel";
 import { Header, Hero, StatusStrip, Ticker } from "./components/ZarShell";
 import { compact, num, sast } from "./lib/format";
+import { buildSeries, buildSeriesFromParties } from "./lib/series";
 import { useDashboard } from "./lib/useDashboard";
 
 export default function App() {
@@ -49,35 +50,23 @@ export default function App() {
   }, [prepoll, national]);
 
   // The live share only exists once ballots are counted; until then the chart
-  // shows the 2021 national baseline, labelled as such.
-  const chart = useMemo<{ parties: ChartParty[]; caption: string }>(() => {
+  // shows the 2021 national baseline, labelled as such. Either way the rule is
+  // the same: parties at or above 1% are named, everything below is "Other".
+  const { series, caption } = useMemo(() => {
     const live = (national?.parties ?? []).filter((p) => p.votes > 0 || p.pct > 0);
     if (live.length > 0) {
       return {
-        parties: live.map((p) => ({
-          id: p.id,
-          abbr: p.abbr,
-          colour: p.colour,
-          pct: p.pct,
-          votes: p.votes,
-          seats: p.seats,
-        })),
-        caption: "2026 count · share of valid votes so far",
+        series: buildSeries(national, tail),
+        caption: "2026 count · parties above 1% · share of valid votes so far",
       };
     }
     const y2021 = prepoll?.elections?.["2021"];
+    const rows = (y2021?.parties ?? []).filter((p) => p.abbr !== "OTHER");
     return {
-      parties: (y2021?.parties ?? []).map((p) => ({
-        id: p.id,
-        abbr: p.abbr,
-        colour: p.colour,
-        pct: p.pct,
-        votes: p.votes,
-        seats: p.seats,
-      })),
+      series: buildSeriesFromParties(rows, y2021?.valid_votes ?? 0),
       caption: y2021 ? `2021 baseline · ${y2021.turnout.toFixed(1)}% turnout` : "awaiting data",
     };
-  }, [national, prepoll]);
+  }, [national, prepoll, tail]);
 
   const pick = (province: string) => {
     setSelected(province);
@@ -132,7 +121,7 @@ export default function App() {
           </div>
 
           <div className="two-col">
-            <PartyChart parties={chart.parties} caption={chart.caption} tail={tail} />
+            <PartyChart series={series} caption={caption} tail={tail} />
             <div className="stack">
               <ProgressPanel national={national} />
               <IntegrityPanel national={national} />
@@ -140,7 +129,7 @@ export default function App() {
           </div>
 
           <div className="stack-wide">
-            <NationalBoard national={national} />
+            <NationalBoard series={series} />
           </div>
         </section>
 

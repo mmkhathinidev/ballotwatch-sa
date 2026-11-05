@@ -71,6 +71,23 @@ export function ProvinceMap({
 }) {
   const byName = new Map(rows.map((r) => [r.name, r]));
 
+  // Colour-coded legend, IEC-style: which party leads which province, and how
+  // many provinces each one holds, so the map's colours mean something.
+  const leaders = new Map<string, { abbr: string; colour: string; count: number }>();
+  let pending = 0;
+  for (const r of rows) {
+    const counted = r.live?.percent_complete?.voting_districts ?? 0;
+    const leader = r.liveLeader;
+    if (!leader || counted <= 0) {
+      pending += 1;
+      continue;
+    }
+    const cur = leaders.get(leader.abbr);
+    if (cur) cur.count += 1;
+    else leaders.set(leader.abbr, { abbr: leader.abbr, colour: leader.colour, count: 1 });
+  }
+  const legend = [...leaders.values()].sort((a, b) => b.count - a.count);
+
   return (
     <div className="map-card">
       <svg className="map-svg" viewBox={ZA_VIEWBOX} role="group" aria-label="Map of South African provinces">
@@ -105,14 +122,25 @@ export function ProvinceMap({
           );
         })}
       </svg>
-      <div className="map-legend">
-        <span className="legend-item">
-          <i className="swatch" style={{ background: "#1c2734" }} /> awaiting count
-        </span>
-        <span className="legend-item">
-          <i className="swatch" style={{ background: "var(--accent)" }} /> party leading
-        </span>
-        <span className="muted">click a province to select it</span>
+      <div className="map-legend-wrap">
+        <div className="map-legend-title">Leading party by province</div>
+        <div className="map-legend">
+          {legend.map((l) => (
+            <span className="legend-item" key={l.abbr}>
+              <i className="swatch" style={{ background: l.colour }} />
+              {l.abbr}
+              <b>{l.count}</b>
+            </span>
+          ))}
+          {pending > 0 ? (
+            <span className="legend-item">
+              <i className="swatch" style={{ background: "#1c2734" }} />
+              awaiting count
+              <b>{pending}</b>
+            </span>
+          ) : null}
+        </div>
+        <div className="map-hint">Click a province to open its detail</div>
       </div>
     </div>
   );

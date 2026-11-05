@@ -65,19 +65,21 @@ Two caveats worth stating plainly:
 - **Party 1909** appears in the 2026 event bundle but in no published party list,
   so it is displayed by ID rather than guessed at.
 
-### The IEC's "OTHER" line is a bucket, not a party
+### Chart rule: 1% earns a name, below that is "Other"
 
 The results feed lists only the parties carrying the contest and folds every
 other party into one `OTHER` row (party ID `-2`). At 10.56% of counted votes in
 2026 it arrived third in a naive sort, which reads as a party result and pushes
 the EFF and the Patriotic Alliance down the ranking.
 
-BallotWatch flags that row as residual in the API, sorts it behind every real
-party, draws it in a neutral hatched grey, labels it *Other* and gives it no
-rank or seat count (the IEC attributes seats to the individual member parties,
-not to the bucket). It is never dropped from a chart, because votes do not
-disappear: 546 parties contested 2026, and in 2021 the same bucket held 7.63% of
-the vote and 621 council seats.
+BallotWatch uses its own rule instead (`frontend/src/lib/series.ts`): a party is
+named and drawn on its own once it clears **1% of the national vote**; everything
+below is folded into one residual "Other" bar, drawn in neutral hatched grey,
+never ranked, never given a seat count. Parties the IEC hides inside its `OTHER`
+row are promoted by name when they clear the line — UDM and ATM currently sit
+above it — and named parties the IEC lists but which fall below 1% are folded
+back in. 546 parties contested 2026, and in 2021 this territory held 7.63% of the
+vote and 621 council seats.
 
 A "Peek inside Other" link under the chart opens a modal sheet with the bucket's
 composition: its current share, how many parties are in it, and a live list of

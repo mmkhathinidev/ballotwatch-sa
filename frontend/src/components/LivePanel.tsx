@@ -1,13 +1,13 @@
 import { National } from "../lib/api";
-import { compact, num, pct, sast } from "../lib/format";
-import { isResidual, orderParties } from "../lib/parties";
+import { compact, num, pct } from "../lib/format";
+import type { Series } from "../lib/series";
+import { CHART_THRESHOLD } from "../lib/series";
 
-export function NationalBoard({ national }: { national: National | null }) {
-  // The residual "OTHER" line sits after every real party: it is an aggregate,
-  // not a contestant, so it must not push a party down the ranking.
-  const parties = orderParties((national?.parties ?? []).filter((p) => p.votes > 0 || p.seats > 0));
-  const named = parties.filter((p) => !isResidual(p)).length;
-  const max = Math.max(1, ...parties.filter((p) => !isResidual(p)).map((p) => p.pct));
+export function NationalBoard({ series }: { series: Series }) {
+  // Same rule as the chart: a party gets a row only above the threshold; the
+  // rest are folded into one residual row at the bottom, unranked.
+  const max = Math.max(1, ...series.shown.map((p) => p.pct));
+  const rows = series.shown.length;
 
   return (
     <div className="card">
@@ -16,11 +16,11 @@ export function NationalBoard({ national }: { national: National | null }) {
           National ballot <span>· all councils combined</span>
         </span>
         <span className="card-tag">
-          {parties.length ? `${named} parties winning votes` : "awaiting count"}
+          {rows ? `${rows} parties above ${CHART_THRESHOLD}%` : "awaiting count"}
         </span>
       </div>
-      {parties.length === 0 ? (
-        <BallotPreview national={national} />
+      {rows === 0 ? (
+        <BallotPreview series={series} />
       ) : (
         <div className="board">
           <div className="board-row head">
@@ -29,48 +29,67 @@ export function NationalBoard({ national }: { national: National | null }) {
             <span>Share of valid votes</span>
             <span className="num-cell">Votes</span>
             <span className="num-cell hide-sm">Seats</span>
-            <span className="num-cell hide-sm">Councils</span>
           </div>
-          {parties.slice(0, 14).map((p, i) => {
-            const residual = isResidual(p);
-            return (
-              <div className={`board-row ${residual ? "residual-row" : ""}`} key={p.id}>
-                <span className="rank">{residual ? "—" : String(i + 1).padStart(2, "0")}</span>
-                <span className="chip">
-                  <i className={`swatch ${residual ? "residual" : ""}`} style={{ background: residual ? "#7c8698" : p.colour }} />
-                  {residual ? "Other" : p.abbr}
+          {series.shown.map((p, i) => (
+            <div className="board-row" key={p.id}>
+              <span className="rank">{String(i + 1).padStart(2, "0")}</span>
+              <span className="chip">
+                <i className="swatch" style={{ background: p.colour }} />
+                {p.abbr}
+              </span>
+              <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span className="bar-track" style={{ flex: 1 }}>
+                  <span
+                    className="bar-fill"
+                    style={{ width: `${(p.pct / max) * 100}%`, background: p.colour, display: "block" }}
+                  />
                 </span>
-                <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span className="bar-track" style={{ flex: 1 }}>
-                    <span
-                      className={`bar-fill ${residual ? "residual" : ""}`}
-                      style={{
-                        width: `${(p.pct / max) * 100}%`,
-                        background: residual ? "#7c8698" : p.colour,
-                        display: "block",
-                      }}
-                    />
-                  </span>
-                  <span className="num-cell" style={{ width: 54 }}>
-                    {pct(p.pct)}
-                  </span>
+                <span className="num-cell" style={{ width: 54 }}>
+                  {pct(p.pct)}
                 </span>
-                <span className="num-cell">{num(p.votes)}</span>
-                <span className="num-cell hide-sm" title={residual ? "Seats are attributed to the individual parties inside this bucket, not to the bucket" : `${p.ward_seats} ward · ${p.pr_seats} PR`}>
-                  {residual ? "—" : num(p.seats)}
-                </span>
-                <span className="num-cell hide-sm">{residual ? "—" : num(p.councils_won)}</span>
-              </div>
-            );
-          })}
+              </span>
+              <span className="num-cell">{num(p.votes)}</span>
+              <span
+                className="num-cell hide-sm"
+                title={p.rebuilt ? "Not on the IEC's own list; tally rebuilt from ward-level results" : undefined}
+              >
+                {p.seats === undefined ? "—" : num(p.seats)}
+              </span>
+            </div>
+          ))}
+          <div className="board-row residual-row">
+            <span className="rank">—</span>
+            <span className="chip">
+              <i className="swatch residual" style={{ background: "#7c8698" }} />
+              Other
+            </span>
+            <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span className="bar-track" style={{ flex: 1 }}>
+                <span
+                  className="bar-fill residual"
+                  style={{
+                    width: `${(series.bucket.pct / max) * 100}%`,
+                    background: "#7c8698",
+                    display: "block",
+                  }}
+                />
+              </span>
+              <span className="num-cell" style={{ width: 54 }}>
+                {pct(series.bucket.pct)}
+              </span>
+            </span>
+            <span className="num-cell">{num(series.bucket.votes)}</span>
+            <span className="num-cell hide-sm" title={`${num(series.bucket.count)} parties below ${CHART_THRESHOLD}%`}>
+              —
+            </span>
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-function BallotPreview({ national }: { national: National | null }) {
-  const parties = (national?.parties ?? []).filter((p) => !isResidual(p));
+function BallotPreview(_props: { series: Series }) {
   return (
     <div>
       <div className="empty">
@@ -80,23 +99,7 @@ function BallotPreview({ national }: { national: National | null }) {
           counted yet. This board fills itself from the Commission's own feed, in the order results
           are captured.
         </span>
-        <code>IEC report date · {sast(national?.report_date)}</code>
       </div>
-      {parties.length > 0 && (
-        <div className="card-body" style={{ borderTop: "1px solid var(--line-soft)" }}>
-          <div className="countdown-label" style={{ marginBottom: 8 }}>
-            Parties the IEC feed lists individually · {parties.length}
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-            {parties.map((p) => (
-              <span key={p.id} className="pill" title={p.name}>
-                <i className="swatch" style={{ background: p.colour }} />
-                {p.abbr}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

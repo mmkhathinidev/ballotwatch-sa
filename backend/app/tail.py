@@ -157,6 +157,7 @@ async def refresh(force: bool = False) -> dict[str, Any]:
             "id": pid,
             "abbr": info.get("name") or names.get(pid) or f"Party {pid}",
             "name": info.get("full_name") or names.get(pid) or f"Party ID {pid}",
+            "colour": info.get("colour") or "#8892a6",
             "votes": votes,
             "pct": _pct(votes, valid),
         })

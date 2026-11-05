@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Meta, National, Prepoll, Province } from "../lib/api";
 import { num, pct, sast } from "../lib/format";
 import { Countdown, FeedPill } from "./Chrome";
@@ -37,6 +38,37 @@ export function StatusStrip({ meta, error }: { meta: Meta | null; error: string 
 }
 
 export function Header() {
+  const [active, setActive] = useState<string>("#top");
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const sections = NAV.map((n) => document.querySelector(n.href)).filter(
+      (el): el is Element => Boolean(el),
+    );
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setActive(`#${visible[0].target.id}`);
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
+    );
+    sections.forEach((s) => observer.observe(s));
+
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - doc.clientHeight;
+      setProgress(max > 0 ? Math.min(1, Math.max(0, doc.scrollTop / max)) : 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   return (
     <header className="site-header">
       <nav className="nav">
@@ -48,7 +80,12 @@ export function Header() {
         </a>
         <div className="nav-links">
           {NAV.map((n) => (
-            <a key={n.href} href={n.href}>
+            <a
+              key={n.href}
+              href={n.href}
+              className={active === n.href ? "active" : ""}
+              aria-current={active === n.href ? "location" : undefined}
+            >
               {n.label}
             </a>
           ))}
@@ -57,6 +94,9 @@ export function Header() {
           Live results
         </a>
       </nav>
+      <div className="scroll-progress" aria-hidden="true">
+        <span style={{ width: `${(progress * 100).toFixed(2)}%` }} />
+      </div>
     </header>
   );
 }
@@ -141,7 +181,7 @@ export function Ticker({
   provinces: Province[];
   prepoll: Prepoll | null;
 }) {
-  const items: { name: string; text: string }[] = [];
+  const items: { name: string; text: string; colour?: string }[] = [];
 
   items.push({
     name: "National",
@@ -157,6 +197,7 @@ export function Ticker({
     const counted = live?.percent_complete?.voting_districts ?? 0;
     items.push({
       name: p.name,
+      colour: leader?.colour,
       text: leader && counted > 0
         ? `${leader.abbr} leading · ${pct(counted, 0)} counted`
         : `${num(base?.registered_voters ?? live?.registered_voters ?? 0)} registered voters · awaiting count`,
@@ -166,13 +207,22 @@ export function Ticker({
   const loop = [...items, ...items];
 
   return (
-    <div className="ticker" aria-hidden="true">
-      <div className="ticker-track">
-        {loop.map((it, i) => (
-          <span className="ticker-item" key={`${it.name}-${i}`}>
-            <strong>{it.name}</strong> · {it.text}
-          </span>
-        ))}
+    <div className="ticker">
+      <span className="ticker-tag">
+        <i className="live-dot" />
+        Live count
+      </span>
+      <div className="ticker-window" aria-hidden="true">
+        <div className="ticker-track">
+          {loop.map((it, i) => (
+            <span className="ticker-item" key={`${it.name}-${i}`}>
+              <i className="ticker-dot" style={{ background: it.colour ?? "var(--gold)" }} />
+              <b>{it.name}</b>
+              <span className="ticker-text">{it.text}</span>
+              <span className="ticker-sep">◆</span>
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );

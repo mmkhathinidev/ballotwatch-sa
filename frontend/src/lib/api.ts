@@ -185,6 +185,7 @@ export type TailParty = {
   id: number;
   abbr: string;
   name: string;
+  colour: string;
   votes: number;
   pct: number;
 };
