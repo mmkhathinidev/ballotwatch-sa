@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import { num, pct } from "../lib/format";
+import { isResidual } from "../lib/parties";
 
 export type ChartParty = {
+  id?: number;
   abbr: string;
   colour: string;
   pct: number;
@@ -17,6 +19,9 @@ const MODES: { key: Mode; label: string }[] = [
   { key: "horizontal", label: "Horizontal" },
 ];
 
+const RESIDUAL_COLOUR = "#7c8698";
+const TOP_N = 8;
+
 export function PartyChart({
   parties,
   caption,
@@ -25,8 +30,17 @@ export function PartyChart({
   caption: string;
 }) {
   const [mode, setMode] = useState<Mode>("bar");
-  const top = useMemo(() => parties.filter((p) => p.pct > 0).slice(0, 8), [parties]);
-  const max = Math.max(1, ...top.map((p) => p.pct));
+  // Rank the real parties, then append the IEC's residual line last. It is
+  // drawn, because hiding it would break the 100% total, but it never ranks.
+  const { top, residual } = useMemo(() => {
+    const withShare = parties.filter((p) => p.pct > 0);
+    const named = withShare.filter((p) => !isResidual(p));
+    return {
+      top: [...named.slice(0, TOP_N), ...withShare.filter(isResidual)],
+      residual: withShare.find(isResidual),
+    };
+  }, [parties]);
+  const max = Math.max(1, ...top.filter((p) => !isResidual(p)).map((p) => p.pct));
 
   return (
     <div className="chart-card">
@@ -61,13 +75,23 @@ export function PartyChart({
 
       <div className="chart-legend">
         {top.map((p) => (
-          <span key={p.abbr} className="legend-item">
-            <i className="swatch" style={{ background: p.colour }} />
-            {p.abbr}
+          <span key={p.abbr} className="legend-item" title={isResidual(p) ? `Aggregate of all parties outside the top ${TOP_N}` : undefined}>
+            <i className={`swatch ${isResidual(p) ? "residual" : ""}`} style={{ background: isResidual(p) ? RESIDUAL_COLOUR : p.colour }} />
+            {isResidual(p) ? `Other (${num(p.votes ?? 0)})` : p.abbr}
             <b>{pct(p.pct)}</b>
           </span>
         ))}
       </div>
+
+      {residual ? (
+        <p className="chart-note">
+          <b>Other</b> is not a party. It is the IEC's residual line — every party outside the{" "}
+          {TOP_N} shown above, {num(residual.votes ?? 0)} votes ({pct(residual.pct)}) combined — so it
+          is drawn last and carries no rank. The bucket is not trivial: in 2021 it held 7.63% of the
+          vote and 621 council seats across the hundreds of parties that did not make the feed's
+          individual list.
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -82,6 +106,11 @@ function Columns({ parties, max }: { parties: ChartParty[]; max: number }) {
 
   return (
     <svg className="chart-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Party share of valid votes">
+      <defs>
+        <pattern id="residual-hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+          <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(255,255,255,0.55)" strokeWidth="2" />
+        </pattern>
+      </defs>
       {[0, 0.25, 0.5, 0.75, 1].map((f) => (
         <g key={f}>
           <line
@@ -100,6 +129,7 @@ function Columns({ parties, max }: { parties: ChartParty[]; max: number }) {
         const h = (p.pct / max) * innerH;
         const x = pad.l + i * step + step * 0.18;
         const w = step * 0.64;
+        const residual = isResidual(p);
         return (
           <g key={p.abbr}>
             <rect
@@ -108,14 +138,17 @@ function Columns({ parties, max }: { parties: ChartParty[]; max: number }) {
               width={w}
               height={Math.max(1, h)}
               rx={5}
-              fill={p.colour}
-              opacity={0.92}
+              fill={residual ? RESIDUAL_COLOUR : p.colour}
+              opacity={residual ? 0.55 : 0.92}
             />
+            {residual ? (
+              <rect x={x} y={pad.t + innerH - h} width={w} height={Math.max(1, h)} rx={5} fill="url(#residual-hatch)" opacity={0.5} />
+            ) : null}
             <text x={x + w / 2} y={pad.t + innerH - h - 6} className="chart-value" textAnchor="middle">
               {pct(p.pct)}
             </text>
             <text x={x + w / 2} y={H - 12} className="chart-axis" textAnchor="middle">
-              {p.abbr}
+              {residual ? "Other" : p.abbr}
             </text>
           </g>
         );
@@ -127,22 +160,25 @@ function Columns({ parties, max }: { parties: ChartParty[]; max: number }) {
 function Horizontal({ parties, max }: { parties: ChartParty[]; max: number }) {
   return (
     <div className="hbars">
-      {parties.map((p) => (
-        <div className="hbar-row" key={p.abbr}>
-          <span className="hbar-label">
-            <i className="swatch" style={{ background: p.colour }} />
-            {p.abbr}
-          </span>
-          <span className="bar-track">
-            <span
-              className="bar-fill"
-              style={{ width: `${(p.pct / max) * 100}%`, background: p.colour, display: "block" }}
-            />
-          </span>
-          <span className="hbar-value">{pct(p.pct)}</span>
-          <span className="hbar-votes muted">{p.votes ? num(p.votes) : "—"}</span>
-        </div>
-      ))}
+      {parties.map((p) => {
+        const residual = isResidual(p);
+        return (
+          <div className="hbar-row" key={p.abbr}>
+            <span className={`hbar-label ${residual ? "residual" : ""}`}>
+              <i className={`swatch ${residual ? "residual" : ""}`} style={{ background: residual ? RESIDUAL_COLOUR : p.colour }} />
+              {residual ? "Other" : p.abbr}
+            </span>
+            <span className="bar-track">
+              <span
+                className={`bar-fill ${residual ? "residual" : ""}`}
+                style={{ width: `${(p.pct / max) * 100}%`, background: residual ? RESIDUAL_COLOUR : p.colour, display: "block" }}
+              />
+            </span>
+            <span className="hbar-value">{pct(p.pct)}</span>
+            <span className="hbar-votes muted">{p.votes ? num(p.votes) : "—"}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -168,7 +204,18 @@ function Doughnut({ parties }: { parties: ChartParty[] }) {
         const sweep = (p.pct / total) * Math.PI * 2;
         const d = arc(cx, cy, r, angle, angle + sweep - 0.012);
         angle += sweep;
-        return <path key={p.abbr} d={d} stroke={p.colour} strokeWidth={34} fill="none" strokeLinecap="butt" />;
+        const residual = isResidual(p);
+        return (
+          <path
+            key={p.abbr}
+            d={d}
+            stroke={residual ? RESIDUAL_COLOUR : p.colour}
+            strokeOpacity={residual ? 0.75 : 1}
+            strokeWidth={34}
+            fill="none"
+            strokeLinecap="butt"
+          />
+        );
       })}
       <text x={cx} y={cy - 4} className="chart-center-value" textAnchor="middle">
         {pct(total, 0)}

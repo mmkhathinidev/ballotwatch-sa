@@ -106,6 +106,17 @@ class NationalViewTests(unittest.TestCase):
         self.assertEqual(row["abbr"], "Party 1909")
         self.assertFalse(row["known"])
 
+    def test_residual_other_never_ranks_above_a_party(self):
+        # The IEC folds every party it does not list into one OTHER row whose
+        # tally can be large. It must still sort behind every real party.
+        payload = national_payload()
+        payload["PartyBallotResults"].append(party(-2, 420_000, 53.16, 0, 0, 0))
+        view = iec.national_view(payload, PARTIES)
+        self.assertEqual([p["abbr"] for p in view["parties"]], ["ANC", "DA", "IND", "Party -2"])
+        last = view["parties"][-1]
+        self.assertTrue(last["residual"])
+        self.assertFalse(any(p["residual"] for p in view["parties"][:-1]))
+
     def test_no_counts_yet(self):
         payload = national_payload()
         for p in payload["PartyBallotResults"]:

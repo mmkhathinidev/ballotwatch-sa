@@ -54,13 +54,21 @@ export default function App() {
     const live = (national?.parties ?? []).filter((p) => p.votes > 0 || p.pct > 0);
     if (live.length > 0) {
       return {
-        parties: live.map((p) => ({ abbr: p.abbr, colour: p.colour, pct: p.pct, votes: p.votes, seats: p.seats })),
+        parties: live.map((p) => ({
+          id: p.id,
+          abbr: p.abbr,
+          colour: p.colour,
+          pct: p.pct,
+          votes: p.votes,
+          seats: p.seats,
+        })),
         caption: "2026 count · share of valid votes so far",
       };
     }
     const y2021 = prepoll?.elections?.["2021"];
     return {
       parties: (y2021?.parties ?? []).map((p) => ({
+        id: p.id,
         abbr: p.abbr,
         colour: p.colour,
         pct: p.pct,

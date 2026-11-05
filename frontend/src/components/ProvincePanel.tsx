@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Prepoll, Province } from "../lib/api";
 import { num, pct } from "../lib/format";
+import { orderParties } from "../lib/parties";
 import { ZA_PROVINCES, ZA_VIEWBOX } from "../lib/zaProvinces";
 
 type PartyMeta = { abbr: string; colour: string };
@@ -253,7 +254,8 @@ export function ProvinceDetail({
     );
   }
 
-  const liveParties = row.live?.parties?.filter((p) => p.votes > 0).slice(0, 6) ?? [];
+  const liveParties =
+    orderParties(row.live?.parties?.filter((p) => p.votes > 0) ?? []).slice(0, 6);
 
   return (
     <div className="card">

@@ -1,5 +1,6 @@
 import { Prepoll } from "../lib/api";
 import { compact, num, pct } from "../lib/format";
+import { isResidual } from "../lib/parties";
 
 export function RegistrationCard({ prepoll }: { prepoll: Prepoll | null }) {
   const reg = prepoll?.registration;
@@ -157,8 +158,9 @@ export function BaselineCard({ prepoll }: { prepoll: Prepoll | null }) {
   const y = prepoll?.elections?.["2021"];
   if (!y) return <CardSkeleton title="2021 baseline" />;
   const parties = y.parties
-    .filter((p) => p.pct > 0.4 && p.abbr && p.abbr !== "OTHER")
+    .filter((p) => p.pct > 0.4 && !isResidual(p))
     .slice(0, 8);
+  const other = y.parties.find(isResidual);
   const max = Math.max(1, ...parties.map((p) => p.pct));
 
   return (
@@ -183,6 +185,12 @@ export function BaselineCard({ prepoll }: { prepoll: Prepoll | null }) {
             <span className="num-cell muted">{num(p.seats)}</span>
           </div>
         ))}
+        {other ? (
+          <div className="chart-note" style={{ borderTop: "none", paddingTop: 4, margin: "4px 8px 6px" }}>
+            Excludes <b>Other</b> — the IEC's residual line: {pct(other.pct)} of the 2021 vote and{" "}
+            {num(other.seats)} seats across every party outside the individually listed top 12.
+          </div>
+        ) : null}
         <div className="stat-grid" style={{ padding: "12px 8px 2px" }}>
           <div className="stat">
             <span>Seats filled</span>

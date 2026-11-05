@@ -78,6 +78,22 @@ def _pct(part: float, whole: float) -> float:
     return round(100.0 * part / whole, 2) if whole else 0.0
 
 
+# The IEC feed lists the parties carrying the contest and folds every other
+# party into one "OTHER" row (ID -2). It is an aggregate of hundreds of
+# micro-parties, not a contestant — 546 parties contested the 2026 municipal
+# election — so it is flagged here and always sorted behind real parties.
+RESIDUAL_IDS = frozenset({-2})
+
+
+def is_residual(party_id: int | None) -> bool:
+    return party_id in RESIDUAL_IDS
+
+
+def _party_sort(v: dict) -> tuple:
+    """Real parties by votes, then the residual bucket dead last."""
+    return (1 if v.get("residual") else 0, -v["votes"], -v["seats"], v["abbr"])
+
+
 def _party_row(p: dict, meta: dict[int, dict], total_valid: int, cast: int,
                registered: int) -> dict:
     info = meta.get(p.get("ID") if p.get("ID") is not None else -1, {})
@@ -88,6 +104,7 @@ def _party_row(p: dict, meta: dict[int, dict], total_valid: int, cast: int,
         "name": info.get("full_name") or info.get("name") or f"Party ID {p.get('ID')}",
         "colour": info.get("colour") or "#8892a6",
         "known": bool(info),
+        "residual": is_residual(p.get("ID")),
         "votes": p.get("TotalValidVotes") or 0,
         "pct": p.get("PercOfVotes") or _pct(p.get("TotalValidVotes") or 0, total_valid),
         "ward_seats": p.get("WardSeatsWon") or 0,
@@ -146,7 +163,7 @@ def national_view(payload: dict, meta: dict[int, dict]) -> dict[str, Any]:
     votes = [_party_row(p, meta, valid, cast, registered) for p in raw]
     for v in votes:
         v["seat_pct"] = _pct(v["seats"], payload.get("SeatsExpected") or 0)
-    votes.sort(key=lambda x: (-x["votes"], -x["seats"], x["abbr"]))
+    votes.sort(key=_party_sort)
 
     return {
         "event_id": payload.get("ElectoralEventID"),
@@ -206,7 +223,7 @@ def province_view(payload: dict, meta: dict[int, dict]) -> dict[str, Any]:
         if (p.get("TotalValidVotes") or 0) > 0 or (p.get("WardSeatsWon") or 0)
         or (p.get("PRSeatsWon") or 0)
     ]
-    votes.sort(key=lambda x: (-x["votes"], -x["seats"], x["abbr"]))
+    votes.sort(key=_party_sort)
     munis = [
         {
             "id": m.get("MunicipalityID"),

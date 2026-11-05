@@ -252,11 +252,17 @@ async def build_baseline() -> dict[str, Any]:
                         "pr_seats": x.get("PRSeatsWon") or 0,
                         "seats": (x.get("WardSeatsWon") or 0) + (x.get("PRSeatsWon") or 0),
                         "councils_won": x.get("CouncilsWon") or 0,
+                        "residual": iec.is_residual(x.get("ID")),
                     }
                     for x in parties
                 ],
             }
-            out["elections"][year]["parties"].sort(key=lambda x: -x["votes"])
+            # The residual "OTHER" line is an aggregate of every party the feed
+            # does not list; keep it behind the real parties so it can never
+            # rank above one.
+            out["elections"][year]["parties"].sort(
+                key=lambda x: (1 if x.get("residual") else 0, -x["votes"])
+            )
             if year == 2021:
                 out["provinces"] = {
                     str(pid): pb
