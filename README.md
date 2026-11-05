@@ -78,6 +78,12 @@ not to the bucket). It is never dropped from a chart, because votes do not
 disappear: 546 parties contested 2026, and in 2021 the same bucket held 7.63% of
 the vote and 621 council seats.
 
+A "Peek inside Other" link under the chart opens a modal sheet with the bucket's
+composition: its current share, the 2021 final, and the ten largest 2021 members
+(none above 0.61%). The 2026 members cannot be itemised — the public bundle
+carries no per-party tally for the tail and the IEC's credentialed API is issued
+by request — so the sheet says so rather than inventing a breakdown.
+
 ## Architecture
 
 ```

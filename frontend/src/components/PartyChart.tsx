@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { num, pct } from "../lib/format";
 import { isResidual } from "../lib/parties";
+import { OtherDetails } from "./OtherDetails";
 
 export type ChartParty = {
   id?: number;
@@ -84,13 +85,14 @@ export function PartyChart({
       </div>
 
       {residual ? (
-        <p className="chart-note">
+        <div className="chart-note">
           <b>Other</b> is not a party. It is the IEC's residual line — every party outside the{" "}
           {TOP_N} shown above, {num(residual.votes ?? 0)} votes ({pct(residual.pct)}) combined — so it
           is drawn last and carries no rank. The bucket is not trivial: in 2021 it held 7.63% of the
           vote and 621 council seats across the hundreds of parties that did not make the feed's
           individual list.
-        </p>
+          <OtherDetails share={residual.pct} votes={residual.votes ?? 0} />
+        </div>
       ) : null}
     </div>
   );
