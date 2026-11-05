@@ -192,7 +192,7 @@ export function Ticker({
 
   for (const p of meta?.provinces ?? []) {
     const live = provinces.find((x) => x.province_id === p.id);
-    const base = prepoll?.provinces?.[String(p.id)];
+    const roll = prepoll?.registration?.provinces?.[p.name] ?? live?.registered_voters ?? 0;
     const leader = live?.parties?.[0];
     const counted = live?.percent_complete?.voting_districts ?? 0;
     items.push({
@@ -200,7 +200,7 @@ export function Ticker({
       colour: leader?.colour,
       text: leader && counted > 0
         ? `${leader.abbr} leading · ${pct(counted, 0)} counted`
-        : `${num(base?.registered_voters ?? live?.registered_voters ?? 0)} registered voters · awaiting count`,
+        : `${num(roll)} registered voters · awaiting count`,
     });
   }
 

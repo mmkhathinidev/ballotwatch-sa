@@ -13,6 +13,7 @@ export type ProvinceRow = {
   turnout2021: number;
   hung2021: number;
   councils2021: number;
+  councils2026: number;
   leader2021?: { id: number; pct: number; votes: number; seats: number; councils_won: number };
   baseParties: { id: number; pct: number; votes: number; seats: number }[];
   live?: Province;
@@ -46,6 +47,7 @@ export function useProvinceRows(prepoll: Prepoll | null, live: Province[]) {
         turnout2021: base?.turnout ?? 0,
         hung2021: base?.hung ?? 0,
         councils2021: base?.councils ?? 0,
+        councils2026: l?.councils?.expected || base?.councils || 0,
         leader2021: base?.parties?.[0],
         baseParties: (base?.parties ?? []).slice(0, 6),
         live: l,
@@ -59,7 +61,6 @@ export function useProvinceRows(prepoll: Prepoll | null, live: Province[]) {
     return { rows, meta };
   }, [prepoll, live]);
 }
-
 export function ProvinceMap({
   rows,
   selected,
@@ -171,7 +172,7 @@ export function ProvinceList({
                 <span className="province-name">{r.name}</span>
                 <span className="province-status">
                   {num(r.registered2026)} registered
-                  {r.councils2021 ? ` · ${r.councils2021} councils` : ""}
+                  {r.councils2026 ? ` · ${r.councils2026} councils` : ""}
                 </span>
               </span>
               {r.liveLeader && counted > 0 ? (
@@ -191,12 +192,10 @@ export function ProvinceList({
 
 export function ProvinceTable({
   rows,
-  meta,
   selected,
   onSelect,
 }: {
   rows: ProvinceRow[];
-  meta: Record<number, PartyMeta>;
   selected: string | null;
   onSelect: (name: string) => void;
 }) {
@@ -206,7 +205,7 @@ export function ProvinceTable({
         <span className="card-title">
           Provincial board <span>· 9 provinces</span>
         </span>
-        <span className="card-tag">live vs 2021 baseline</span>
+        <span className="card-tag">2026 count</span>
       </div>
       <div className="table-wrap">
         <table className="data">
@@ -214,50 +213,32 @@ export function ProvinceTable({
             <tr>
               <th>Province</th>
               <th className="r">Registered</th>
-              <th className="r hide-sm">2021 turnout</th>
-              <th>2021 leader</th>
-              <th>Live leader</th>
+              <th className="r hide-sm">Ballots</th>
+              <th>Leader</th>
+              <th className="r">Share</th>
               <th className="r">Counted</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => {
-              const lm = r.leader2021 ? meta[r.leader2021.id] : undefined;
-              return (
-                <tr key={r.id} className={selected === r.name ? "active" : ""} onClick={() => onSelect(r.name)}>
-                  <td className="name">{r.name}</td>
-                  <td className="r">{num(r.registered2026)}</td>
-                  <td className="r hide-sm muted">{r.turnout2021 ? pct(r.turnout2021) : "—"}</td>
-                  <td>
-                    {lm ? (
-                      <span className="prov-cell">
-                        <i className="swatch" style={{ background: lm.colour }} />
-                        {lm.abbr}
-                        <span className="muted" style={{ fontSize: 11.5 }}>
-                          {pct(r.leader2021?.pct ?? 0)}
-                        </span>
-                      </span>
-                    ) : (
-                      <span className="muted">—</span>
-                    )}
-                  </td>
-                  <td>
-                    {r.liveLeader ? (
-                      <span className="prov-cell">
-                        <i className="swatch" style={{ background: r.liveLeader.colour }} />
-                        {r.liveLeader.abbr}
-                        <span className="muted" style={{ fontSize: 11.5 }}>
-                          {pct(r.liveLeader.pct)}
-                        </span>
-                      </span>
-                    ) : (
-                      <span className="muted">awaiting count</span>
-                    )}
-                  </td>
-                  <td className="r">{r.live ? pct(r.live.percent_complete?.voting_districts ?? 0, 0) : "0%"}</td>
-                </tr>
-              );
-            })}
+            {rows.map((r) => (
+              <tr key={r.id} className={selected === r.name ? "active" : ""} onClick={() => onSelect(r.name)}>
+                <td className="name">{r.name}</td>
+                <td className="r">{num(r.registered2026)}</td>
+                <td className="r hide-sm muted">{r.live?.ballots_cast ? num(r.live.ballots_cast) : "—"}</td>
+                <td>
+                  {r.liveLeader ? (
+                    <span className="prov-cell">
+                      <i className="swatch" style={{ background: r.liveLeader.colour }} />
+                      {r.liveLeader.abbr}
+                    </span>
+                  ) : (
+                    <span className="muted">awaiting count</span>
+                  )}
+                </td>
+                <td className="r">{r.liveLeader ? pct(r.liveLeader.pct) : "—"}</td>
+                <td className="r">{r.live ? pct(r.live.percent_complete?.voting_districts ?? 0, 0) : "0%"}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -291,7 +272,7 @@ export function ProvinceDetail({
         <div>
           <div className="detail-title">{row.name}</div>
           <div className="detail-meta">
-            {num(row.registered2026)} registered · {num(row.councils2021)} councils in 2021
+            {num(row.registered2026)} registered · {num(row.councils2026)} councils
           </div>
         </div>
         <span className="card-tag" style={{ marginLeft: "auto" }}>
@@ -339,7 +320,8 @@ export function ProvinceDetail({
         ) : (
           <>
             <div className="countdown-label" style={{ marginBottom: 10 }}>
-              2021 result · turnout {pct(row.turnout2021)} · {row.hung2021} hung councils
+              No 2026 bundle yet · last election (2021): turnout {pct(row.turnout2021)} ·{" "}
+              {row.hung2021} hung councils
             </div>
             <PartyBars
               parties={row.baseParties.map((p) => ({

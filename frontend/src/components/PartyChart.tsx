@@ -95,8 +95,8 @@ export function PartyChart({
           <b>Other</b> is every party below {CHART_THRESHOLD}% — {num(series.bucket.count)} parties
           holding {num(series.bucket.votes)} votes ({pct(series.bucket.pct)}) between them. It is
           drawn last and never ranked, because no single party in it clears the {CHART_THRESHOLD}%
-          line. It is not trivia either: in 2021 this territory was 7.63% of the vote and 621 council
-          seats.
+          line. It is not trivia either: at the last municipal election this territory held 7.6% of
+          the vote and 621 council seats.
           <OtherDetails series={series} tail={tail} />
         </div>
       ) : null}

@@ -136,7 +136,7 @@ export default function App() {
         <section id="provinces">
           <div className="section-header">
             <h2>Provinces</h2>
-            <span className="section-note">registered voters, 2021 baseline, live leader</span>
+            <span className="section-note">2026 results · roll, progress and leader by province</span>
           </div>
 
           <div className="map-section">
@@ -145,7 +145,7 @@ export default function App() {
           </div>
 
           <div className="grid-2 board-pair">
-            <ProvinceTable rows={rows} meta={partyMeta} selected={active?.name ?? null} onSelect={setSelected} />
+            <ProvinceTable rows={rows} selected={active?.name ?? null} onSelect={setSelected} />
             <ProvinceDetail row={active} meta={partyMeta} />
           </div>
         </section>
@@ -161,7 +161,7 @@ export default function App() {
         <section id="prepoll">
           <div className="section-header">
             <h2>Pre-poll picture</h2>
-            <span className="section-note">the roll, turnout and the last result</span>
+            <span className="section-note">2026 roll · turnout history · the 2021 result</span>
           </div>
           <div className="grid-2even">
             <RegistrationCard prepoll={prepoll} />

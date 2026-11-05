@@ -14,7 +14,10 @@ const METROS: { name: string; province: string }[] = [
 ];
 
 function shortName(name: string) {
-  return name.replace(/^City of /, "");
+  return name
+    .replace(/^[A-Z]{3}\s*-\s*/, "") // IEC prefixes codes: "NMA - Nelson Mandela Bay"
+    .replace(/^City of /, "")
+    .trim();
 }
 
 export function Metros({
@@ -30,7 +33,7 @@ export function Metros({
     return METROS.map((m) => {
       const province = live.find((p) => p.province === m.province);
       const muni = province?.municipalities?.find(
-        (x) => x.name === m.name || x.name === shortName(m.name) || shortName(x.name) === shortName(m.name)
+        (x) => shortName(x.name).toLowerCase() === shortName(m.name).toLowerCase(),
       );
       const leader = muni?.parties?.[0];
       return {

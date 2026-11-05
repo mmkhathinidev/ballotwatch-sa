@@ -54,14 +54,16 @@ export function SearchPanel({
 
     const list: Entry[] = (meta?.provinces ?? []).map((p) => {
       const l = byName.get(p.name);
-      const base = prepoll?.provinces?.[String(p.id)];
+      // The 2026 roll lives in registration.provinces; prepoll.provinces holds
+      // the 2021 election's roll and must not be shown as current.
+      const roll = prepoll?.registration?.provinces?.[p.name] ?? l?.registered_voters ?? 0;
       const leader = l?.parties?.[0];
       return {
         name: p.name,
         type: "province",
-        meta: `${num(base?.registered_voters ?? l?.registered_voters ?? 0)} registered voters`,
+        meta: `${num(roll)} registered voters`,
         province: p.name,
-        registered: base?.registered_voters ?? l?.registered_voters,
+        registered: roll,
         counted: l?.percent_complete?.voting_districts ?? 0,
         leader: leader && (l?.percent_complete?.voting_districts ?? 0) > 0 ? leader.abbr : undefined,
       };
