@@ -43,6 +43,8 @@ export function Metros({
         leaderColour: leader?.colour,
         leaderPct: leader?.pct ?? 0,
         complete: muni?.complete ?? false,
+        wards: muni?.wards ?? 0,
+        wardsComplete: muni?.wards_complete ?? 0,
         counted: muni ? (muni.complete ? 100 : 0) : null,
       };
     });
@@ -69,9 +71,9 @@ export function Metros({
                 {c.leader} leading
               </>
             ) : c.registered ? (
-              `${num(c.registered)} registered`
+              `${num(c.registered)} registered · ${c.wardsComplete}/${c.wards} wards`
             ) : (
-              "awaiting count"
+              "not yet in the IEC feed"
             )}
           </span>
         </button>

@@ -50,6 +50,8 @@ export type Municipality = {
   votes_cast: number;
   valid_votes: number;
   seats: number;
+  wards?: number;
+  wards_complete?: number;
   hung: number;
   complete: boolean;
   leader: number | null;

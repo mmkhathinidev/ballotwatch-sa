@@ -195,25 +195,17 @@ class Poller:
             return self.state
 
     async def _poll_provinces(self, national_payload: dict) -> dict[int, dict]:
-        out: dict[int, dict] = {}
-        embedded = {
-            p.get("ProvinceID"): p
-            for p in (national_payload.get("ProvinceResults") or [])
-            if p.get("ProvinceID")
-        }
-        if embedded:
-            for pid, p in embedded.items():
-                store.save_snapshot(
-                    CURRENT_EVENT, "province", str(pid), p.get("ReportDate"), now_iso(), p
-                )
-            return {pid: iec.province_view(p, self.parties) for pid, p in embedded.items()}
-
+        # The dedicated province panels are the complete document: all 44
+        # KwaZulu-Natal municipalities, including eThekwini. The province tree
+        # embedded in the national bundle is trimmed (it omitted eThekwini and
+        # six other KZN councils), so it is a fallback only — never the source.
         tasks = {
             pid: asyncio.create_task(
                 iec.fetch(self.client, iec.event_url(CURRENT_YEAR, f"Province{pid}"))
             )
             for pid in PROVINCES
         }
+        out: dict[int, dict] = {}
         for pid, task in tasks.items():
             fetched = await task
             payload = iec.parse(fetched)
@@ -225,7 +217,20 @@ class Poller:
                 CURRENT_EVENT, "province", str(pid), payload.get("ReportDate"), now_iso(), payload
             )
             out[pid] = iec.province_view(payload, self.parties)
-        return out
+
+        if out:
+            return out
+
+        embedded = {
+            p.get("ProvinceID"): p
+            for p in (national_payload.get("ProvinceResults") or [])
+            if p.get("ProvinceID")
+        }
+        for pid, p in embedded.items():
+            store.save_snapshot(
+                CURRENT_EVENT, "province", str(pid), p.get("ReportDate"), now_iso(), p
+            )
+        return {pid: iec.province_view(p, self.parties) for pid, p in embedded.items()}
 
     # -- views -------------------------------------------------------------
     def national(self) -> dict[str, Any]:

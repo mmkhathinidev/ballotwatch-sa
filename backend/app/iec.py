@@ -232,10 +232,20 @@ def province_view(payload: dict, meta: dict[int, dict]) -> dict[str, Any]:
             "votes_cast": (m.get("PartyBallotResults") or [{}])[0].get("TotalVotesCast", 0),
             "valid_votes": (m.get("PartyBallotResults") or [{}])[0].get("ValidVotesCast", 0),
             "seats": m.get("SeatsExpected", 0),
+            "wards": m.get("WardExpected", 0),
+            "wards_complete": m.get("WardsComplete", 0),
             "hung": m.get("HungCouncils", 0),
             "complete": (m.get("Perc_WardsComplete") or 0) >= 100,
-            "leader": (m.get("PartyBallotResults") or [{}])[0].get("ID"),
-            "leader_pct": (m.get("PartyBallotResults") or [{}])[0].get("PercOfVotes", 0),
+            "leader": next(
+                (r.get("ID") for r in (m.get("PartyBallotResults") or [])
+                 if (r.get("TotalValidVotes") or 0) > 0),
+                None,
+            ),
+            "leader_pct": next(
+                (r.get("PercOfVotes") or 0 for r in (m.get("PartyBallotResults") or [])
+                 if (r.get("TotalValidVotes") or 0) > 0),
+                0,
+            ),
             "parties": sorted(
                 [
                     {
